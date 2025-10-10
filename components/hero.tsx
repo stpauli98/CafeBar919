@@ -15,19 +15,27 @@ export function Hero() {
   return (
     <section id="početna" className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <Image src="/images/hero-bar.png" alt="Caffe Bar 919 interior" fill className="object-cover" priority />
+        <Image
+          src="/images/hero-bar.png"
+          alt="Caffe Bar 919 interior"
+          fill
+          sizes="100vw"
+          quality={90}
+          priority
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#191919]/70 via-[#191919]/50 to-[#191919]" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <h1 className="font-[family-name:var(--font-cinzel)] text-5xl md:text-7xl lg:text-8xl text-[#F5F1E6] mb-6 tracking-wide leading-tight">
+        <h1 className="font-[family-name:var(--font-cinzel)] text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-[#F5F1E6] mb-6 tracking-wide leading-tight">
           —919—
         </h1>
         <div className="w-24 h-[1px] bg-[#D3B574] mx-auto mb-6" />
-        <h2 className="font-[family-name:var(--font-cinzel)] text-2xl md:text-3xl text-[#D3B574] mb-8 tracking-wider">
+        <h2 className="font-[family-name:var(--font-cinzel)] text-xl sm:text-2xl md:text-3xl text-[#D3B574] mb-8 tracking-wider">
           CAFFE BAR
         </h2>
-        <p className="text-[#F5F1E6] text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-[#F5F1E6] text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed px-4">
           Mjesto gdje se elegancija i dobra atmosfera sreću.
           <br />
           Kafa po danu, ritam po noći.

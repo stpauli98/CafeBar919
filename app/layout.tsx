@@ -14,15 +14,46 @@ const cinzel = Cinzel({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.caffebar919.com"),
   title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
   description:
     "Kafa po danu, ritam po noći. Caffe Bar 919 — topao, elegantan ambijent, posebna ponuda pića i događaji uživo. Adresa, radno vrijeme, rezervacije.",
-  generator: "v0.app",
+  keywords: ["caffe bar", "gradiska", "kafa", "bar", "919", "caffe bar 919"],
+  authors: [{ name: "Next Pixel", url: "https://www.nextpixel.dev" }],
+  creator: "Next Pixel",
   openGraph: {
+    type: "website",
+    locale: "sr_RS",
+    url: "https://www.caffebar919.com",
+    siteName: "Caffe Bar 919",
+    title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
+    description: "Kafa po danu, ritam po noći. Mjesto gdje se elegancija i dobra atmosfera sreću.",
+    images: [
+      {
+        url: "/images/entrance-exterior.png",
+        width: 1200,
+        height: 630,
+        alt: "Caffe Bar 919",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
     description: "Kafa po danu, ritam po noći. Mjesto gdje se elegancija i dobra atmosfera sreću.",
     images: ["/images/entrance-exterior.png"],
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#191919",
 }
 
 export default function RootLayout({

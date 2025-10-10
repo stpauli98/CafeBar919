@@ -18,7 +18,7 @@ const events = [
     type: "Live Music",
   },
   {
-    title: "Ceca • Viski",
+    title: "Whiskey Night",
     date: "Četvrtak, 24. Oktobar",
     time: "21:00",
     description: "Specijalna večer sa whiskey degustacijom",

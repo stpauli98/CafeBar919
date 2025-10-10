@@ -7,7 +7,15 @@ export function About() {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative h-[500px] rounded-lg overflow-hidden">
-            <Image src="/images/interior-seating.png" alt="Interior Caffe Bar 919" fill className="object-cover" />
+            <Image
+              src="/images/interior-seating.png"
+              alt="Interior Caffe Bar 919"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={85}
+              priority
+              className="object-cover"
+            />
           </div>
 
           <div>

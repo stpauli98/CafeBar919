@@ -40,6 +40,9 @@ export function Gallery() {
                 src={image.src || "/placeholder.svg"}
                 alt={image.alt}
                 fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                loading="lazy"
+                quality={85}
                 className="object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-[#191919]/0 group-hover:bg-[#191919]/40 transition-colors duration-300" />
@@ -64,6 +67,9 @@ export function Gallery() {
               src={galleryImages[selectedImage].src || "/placeholder.svg"}
               alt={galleryImages[selectedImage].alt}
               fill
+              sizes="100vw"
+              quality={90}
+              priority
               className="object-contain"
             />
           </div>

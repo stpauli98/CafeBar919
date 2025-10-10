@@ -1,18 +1,19 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import type LocomotiveScroll from "locomotive-scroll"
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let locomotiveScroll: any
+    let locomotiveScroll: LocomotiveScroll | null = null
 
     const initLocomotiveScroll = async () => {
-      const LocomotiveScroll = (await import("locomotive-scroll")).default
+      const LocomotiveScrollModule = (await import("locomotive-scroll")).default
 
       if (scrollRef.current) {
-        locomotiveScroll = new LocomotiveScroll({
+        locomotiveScroll = new LocomotiveScrollModule({
           el: scrollRef.current,
           smooth: true,
           multiplier: 1,
