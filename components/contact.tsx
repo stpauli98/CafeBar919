@@ -27,7 +27,7 @@ export function Contact() {
                 <MapPin className="text-[#D3B574] mt-1 flex-shrink-0" size={20} />
                 <div>
                   <p className="text-[#F5F1E6] font-medium mb-1">Adresa</p>
-                  <p className="text-[#A8A8A8]">Centar grada, Gradiška</p>
+                  <p className="text-[#A8A8A8]">Trg svetog Save, Gradiška 78400</p>
                 </div>
               </div>
 
@@ -91,7 +91,7 @@ export function Contact() {
                 className="w-full border-[#D3B574] text-[#D3B574] hover:bg-[#D3B574]/10 py-6 bg-transparent"
                 asChild
               >
-                <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.google.com/maps/place/Caffe+Bar+919/@45.146878,17.2525711,17z/data=!3m1!4b1!4m6!3m5!1s0x47675f0051fe7357:0x36681e81ccb07c3f!8m2!3d45.146878!4d17.255146!16s%2Fg%2F11md__0fbm?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">
                   <Navigation size={18} className="mr-2" />
                   Navigiraj do nas
                 </a>
