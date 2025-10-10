@@ -45,13 +45,26 @@ export function Footer() {
             <h4 className="text-[#F5F1E6] font-medium mb-4">Radno vrijeme</h4>
             <div className="text-[#A8A8A8] text-sm space-y-2">
               <p>Ponedjeljak - Nedjelja</p>
-              <p className="text-[#D3B574]">08:00 - 01:00</p>
+              <p className="text-[#D3B574]">07:00 - 23:30</p>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-[#D3B574]/30">
-          <p className="text-center text-[#A8A8A8] text-sm">© 2025 Caffe Bar 919. Sva prava zadržana.</p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-center text-[#A8A8A8] text-sm">© 2025 Caffe Bar 919. Sva prava zadržana.</p>
+            <p className="text-center text-[#A8A8A8] text-sm">
+              Stranicu izradio{" "}
+              <a
+                href="https://www.nextpixel.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D3B574] hover:underline"
+              >
+                Next Pixel
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
