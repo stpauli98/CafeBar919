@@ -6,18 +6,21 @@ import { Events } from "@/components/events"
 import { Gallery } from "@/components/gallery"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
+import { SmoothScroll } from "@/components/smooth-scroll"
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      <Header />
-      <Hero />
-      <About />
-      <Menu />
-      <Events />
-      <Gallery />
-      <Contact />
-      <Footer />
-    </main>
+    <SmoothScroll>
+      <main className="min-h-screen">
+        <Header />
+        <Hero />
+        <About />
+        <Menu />
+        <Events />
+        <Gallery />
+        <Contact />
+        <Footer />
+      </main>
+    </SmoothScroll>
   )
 }
