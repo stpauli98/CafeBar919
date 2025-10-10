@@ -45,7 +45,7 @@ export function Contact() {
                 <Clock className="text-[#D3B574] mt-1 flex-shrink-0" size={20} />
                 <div>
                   <p className="text-[#F5F1E6] font-medium mb-1">Radno vrijeme</p>
-                  <p className="text-[#A8A8A8]">Pon - Ned: 08:00 - 01:00</p>
+                  <p className="text-[#A8A8A8]">Pon - Ned: 07:00 - 23:30</p>
                 </div>
               </div>
 
