@@ -156,13 +156,13 @@ export function Gallery() {
 
       {selectedImage !== null && (
         <div
-          className="fixed inset-0 z-50 bg-[#191919]/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-[#191919]/95 flex items-center justify-center"
           onClick={() => setSelectedImage(null)}
         >
           {/* Close button */}
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10"
+            className="absolute top-6 right-6 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10"
           >
             <X size={32} />
           </button>
@@ -173,7 +173,7 @@ export function Gallery() {
               e.stopPropagation()
               navigatePrevious()
             }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
+            className="absolute left-6 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
             aria-label="Prethodna slika"
           >
             <ChevronLeft size={32} />
@@ -185,14 +185,14 @@ export function Gallery() {
               e.stopPropagation()
               navigateNext()
             }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
+            className="absolute right-6 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
             aria-label="Sljedeća slika"
           >
             <ChevronRight size={32} />
           </button>
 
           {/* Image counter */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[#F5F1E6] bg-[#191919]/60 px-4 py-2 rounded-full z-10">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[#F5F1E6] bg-[#191919]/60 px-4 py-2 rounded-full z-10">
             {selectedImage + 1} / {galleryImages.length}
           </div>
 
@@ -204,14 +204,14 @@ export function Gallery() {
           )}
 
           <div
-            className="relative w-full max-w-5xl h-[80vh]"
+            className="relative w-[85vw] h-[75vh] md:w-[90vw] md:h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
               src={galleryImages[selectedImage].src || "/placeholder.svg"}
               alt={galleryImages[selectedImage].alt}
               fill
-              sizes="100vw"
+              sizes="(max-width: 768px) 85vw, 90vw"
               quality={90}
               priority
               className="object-contain"
