@@ -17,10 +17,10 @@ export function LoadingScreen() {
     // Start fade out animation after 3 seconds
     const fadeTimer = setTimeout(() => {
       setIsAnimating(true)
-      // Remove from DOM after fade completes
+      // Remove from DOM after fade completes (1000ms for smoother fade)
       setTimeout(() => {
         setIsVisible(false)
-      }, 500)
+      }, 1000)
     }, 3000)
 
     return () => {
@@ -33,7 +33,7 @@ export function LoadingScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] bg-[#191919] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[9999] bg-[#191919] transition-opacity duration-1000 ease-out ${
         isAnimating ? "opacity-0" : "opacity-100"
       }`}
     >

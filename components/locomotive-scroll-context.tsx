@@ -48,6 +48,7 @@ export function LocomotiveScrollProvider({ children }: { children: React.ReactNo
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
+    const updateIntervals: NodeJS.Timeout[] = []
 
     const initLocomotiveScroll = async () => {
       const LocomotiveScrollModule = (await import("locomotive-scroll")).default
@@ -69,6 +70,18 @@ export function LocomotiveScrollProvider({ children }: { children: React.ReactNo
         timeoutId = setTimeout(() => {
           setIsReady(true)
         }, 100)
+
+        // Update scroll multiple times during page load to handle dynamic content
+        // This ensures the scroll height is correct as images and API data load
+        const updateTimes = [300, 600, 1000, 1500, 2000, 3000]
+        updateTimes.forEach((time) => {
+          const timer = setTimeout(() => {
+            if (locomotiveScrollRef.current) {
+              locomotiveScrollRef.current.update()
+            }
+          }, time)
+          updateIntervals.push(timer)
+        })
       }
     }
 
@@ -85,6 +98,7 @@ export function LocomotiveScrollProvider({ children }: { children: React.ReactNo
 
     return () => {
       clearTimeout(timeoutId)
+      updateIntervals.forEach((timer) => clearTimeout(timer))
       window.removeEventListener("resize", handleResize)
       // Clear callbacks from a copy to avoid stale reference
       const callbacks = scrollCallbacksRef.current

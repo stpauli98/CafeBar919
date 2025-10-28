@@ -7,20 +7,24 @@ import { Gallery } from "@/components/gallery"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
 import { SmoothScroll } from "@/components/smooth-scroll"
+import { LoadingScreen } from "@/components/loading-screen"
 
 export default function Home() {
   return (
-    <SmoothScroll>
-      <main className="min-h-screen">
-        <Header />
-        <Hero />
-        <About />
-        <Menu />
-        <Events />
-        <Gallery />
-        <Contact />
-        <Footer />
-      </main>
-    </SmoothScroll>
+    <>
+      <LoadingScreen />
+      <SmoothScroll>
+        <main className="min-h-screen">
+          <Header />
+          <Hero />
+          <Events />
+          <Gallery />
+          <Menu />
+          <About />
+          <Contact />
+          <Footer />
+        </main>
+      </SmoothScroll>
+    </>
   )
 }

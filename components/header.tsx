@@ -25,7 +25,9 @@ export function Header() {
   }, [isReady, onScroll])
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id)
+    // Map "početna" to "hero" section
+    const sectionId = id === "početna" ? "hero" : id
+    const element = document.getElementById(sectionId)
     if (element && scroll) {
       // Use Locomotive's scrollTo method for smooth integration
       scroll.scrollTo(element, {
@@ -57,7 +59,7 @@ export function Header() {
         </button>
 
         <nav className="hidden lg:flex items-center gap-8">
-          {["Početna", "O nama", "Meni", "Događaji", "Galerija", "Kontakt"].map((item) => (
+          {["Početna", "Događaji", "Galerija", "Meni", "O nama", "Kontakt"].map((item) => (
             <button
               key={item}
               onClick={() => scrollToSection(item.toLowerCase().replace(" ", "-"))}
@@ -85,7 +87,7 @@ export function Header() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-[#1F1F1F] border-t border-white/10">
           <nav className="container mx-auto px-4 py-6 flex flex-col gap-4">
-            {["Početna", "O nama", "Meni", "Događaji", "Galerija", "Kontakt"].map((item) => (
+            {["Početna", "Događaji", "Galerija", "Meni", "O nama", "Kontakt"].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase().replace(" ", "-"))}

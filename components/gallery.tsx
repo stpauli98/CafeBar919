@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
-import { X, ChevronDown } from "lucide-react"
+import { X, ChevronDown, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useLocomotiveScroll } from "@/components/locomotive-scroll-context"
 
 const galleryImages = [
   { src: "/images/image1.webp", alt: "Elegantni bar sa modernim ambijentom" },
@@ -27,9 +28,37 @@ const INITIAL_DISPLAY_COUNT = 4
 export function Gallery() {
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const [showAll, setShowAll] = useState(false)
+  const [isImageLoading, setIsImageLoading] = useState(false)
+  const { scroll } = useLocomotiveScroll()
 
   const displayedImages = showAll ? galleryImages : galleryImages.slice(0, INITIAL_DISPLAY_COUNT)
   const hasMoreImages = galleryImages.length > INITIAL_DISPLAY_COUNT
+
+  // Update Locomotive Scroll when images are loaded
+  useEffect(() => {
+    if (showAll && scroll) {
+      // Wait for images to load before updating scroll
+      const timer = setTimeout(() => {
+        scroll.update()
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [showAll, scroll])
+
+  // Disable Locomotive Scroll when modal is open
+  useEffect(() => {
+    if (scroll) {
+      if (selectedImage !== null) {
+        scroll.stop()
+        // Reset loading state when opening modal
+        setIsImageLoading(true)
+      } else {
+        scroll.start()
+        scroll.update()
+        setIsImageLoading(false)
+      }
+    }
+  }, [selectedImage, scroll])
 
   return (
     <section id="galerija" className="py-24 bg-[#1F1F1F]">
@@ -86,10 +115,18 @@ export function Gallery() {
         >
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D3B574] transition-colors"
+            className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10"
           >
             <X size={32} />
           </button>
+
+          {/* Loading spinner */}
+          {isImageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 size={48} className="text-[#D3B574] animate-spin" />
+            </div>
+          )}
+
           <div className="relative w-full max-w-5xl h-[80vh]">
             <Image
               src={galleryImages[selectedImage].src || "/placeholder.svg"}
@@ -99,6 +136,8 @@ export function Gallery() {
               quality={90}
               priority
               className="object-contain"
+              onLoadingComplete={() => setIsImageLoading(false)}
+              onError={() => setIsImageLoading(false)}
             />
           </div>
         </div>
