@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
-import { X, ChevronDown, Loader2 } from "lucide-react"
+import { X, ChevronDown, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLocomotiveScroll } from "@/components/locomotive-scroll-context"
 
@@ -45,20 +45,66 @@ export function Gallery() {
     }
   }, [showAll, scroll])
 
-  // Disable Locomotive Scroll when modal is open
+  // Disable Locomotive Scroll and lock body scroll when modal is open
   useEffect(() => {
-    if (scroll) {
-      if (selectedImage !== null) {
+    if (selectedImage !== null) {
+      // Stop Locomotive Scroll
+      if (scroll) {
         scroll.stop()
-        // Reset loading state when opening modal
-        setIsImageLoading(true)
-      } else {
+      }
+      // Lock body scroll to prevent background from moving
+      document.body.style.overflow = "hidden"
+      // Reset loading state when opening modal
+      setIsImageLoading(true)
+    } else {
+      // Resume Locomotive Scroll
+      if (scroll) {
         scroll.start()
         scroll.update()
-        setIsImageLoading(false)
       }
+      // Unlock body scroll
+      document.body.style.overflow = ""
+      setIsImageLoading(false)
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = ""
     }
   }, [selectedImage, scroll])
+
+  const navigatePrevious = useCallback(() => {
+    if (selectedImage === null) return
+    setIsImageLoading(true)
+    setSelectedImage((prev) => (prev === 0 ? galleryImages.length - 1 : prev! - 1))
+  }, [selectedImage])
+
+  const navigateNext = useCallback(() => {
+    if (selectedImage === null) return
+    setIsImageLoading(true)
+    setSelectedImage((prev) => (prev === galleryImages.length - 1 ? 0 : prev! + 1))
+  }, [selectedImage])
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (selectedImage === null) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        navigatePrevious()
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault()
+        navigateNext()
+      } else if (e.key === "Escape") {
+        e.preventDefault()
+        setSelectedImage(null)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [selectedImage, navigatePrevious, navigateNext])
 
   return (
     <section id="galerija" className="py-24 bg-[#1F1F1F]">
@@ -113,12 +159,42 @@ export function Gallery() {
           className="fixed inset-0 z-50 bg-[#191919]/95 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
+          {/* Close button */}
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10"
           >
             <X size={32} />
           </button>
+
+          {/* Previous button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              navigatePrevious()
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
+            aria-label="Prethodna slika"
+          >
+            <ChevronLeft size={32} />
+          </button>
+
+          {/* Next button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              navigateNext()
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#F5F1E6] hover:text-[#D3B574] transition-colors z-10 bg-[#191919]/60 hover:bg-[#191919]/80 rounded-full p-3"
+            aria-label="Sljedeća slika"
+          >
+            <ChevronRight size={32} />
+          </button>
+
+          {/* Image counter */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[#F5F1E6] bg-[#191919]/60 px-4 py-2 rounded-full z-10">
+            {selectedImage + 1} / {galleryImages.length}
+          </div>
 
           {/* Loading spinner */}
           {isImageLoading && (
@@ -127,7 +203,10 @@ export function Gallery() {
             </div>
           )}
 
-          <div className="relative w-full max-w-5xl h-[80vh]">
+          <div
+            className="relative w-full max-w-5xl h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
               src={galleryImages[selectedImage].src || "/placeholder.svg"}
               alt={galleryImages[selectedImage].alt}
@@ -136,7 +215,7 @@ export function Gallery() {
               quality={90}
               priority
               className="object-contain"
-              onLoadingComplete={() => setIsImageLoading(false)}
+              onLoad={() => setIsImageLoading(false)}
               onError={() => setIsImageLoading(false)}
             />
           </div>

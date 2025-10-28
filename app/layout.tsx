@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   keywords: ["caffe bar", "gradiska", "kafa", "bar", "919", "caffe bar 919"],
   authors: [{ name: "Next Pixel", url: "https://www.nextpixel.dev" }],
   creator: "Next Pixel",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
   openGraph: {
     type: "website",
     locale: "sr_RS",
