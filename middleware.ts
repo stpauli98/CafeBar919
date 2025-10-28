@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
+export async function middleware(_request: NextRequest) {
   // TEMPORARY: Disable middleware for testing
+  // TODO: Re-enable authentication after fixing Supabase cookie handling
   return NextResponse.next()
+
+  /* DISABLED - Uncomment when ready to enable auth protection
+  const { pathname } = request.nextUrl
 
   // Protect /admin/events route
   if (pathname.startsWith("/admin/events")) {
@@ -14,44 +16,35 @@ export async function middleware(request: NextRequest) {
       request.cookies.get("sb-wswizqibfqrmujlcfrav-auth-token")?.value ||
       request.cookies.get("supabase-auth-token")?.value
 
-    console.log("Middleware - Token found:", !!token)
-
     if (!token) {
-      // No auth token, redirect to login
-      console.log("Middleware - No token, redirecting to login")
       const loginUrl = new URL("/admin/login", request.url)
       return NextResponse.redirect(loginUrl)
     }
 
-    // Try to verify the session with Supabase
     try {
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
 
-      // Parse the token (it's usually a JSON string with access_token)
-      let parsedToken
+      let accessToken: string
       try {
-        parsedToken = JSON.parse(token)
+        const parsedToken = JSON.parse(token)
+        accessToken = parsedToken.access_token || token
       } catch {
-        parsedToken = { access_token: token }
+        accessToken = token
       }
 
       const {
         data: { user },
         error,
-      } = await supabase.auth.getUser(parsedToken.access_token || token)
-
-      console.log("Middleware - User check:", user ? "authenticated" : "not authenticated", error)
+      } = await supabase.auth.getUser(accessToken)
 
       if (error || !user) {
-        console.log("Middleware - Invalid session, redirecting to login")
         const loginUrl = new URL("/admin/login", request.url)
         return NextResponse.redirect(loginUrl)
       }
 
-      // User authenticated, allow access
       return NextResponse.next()
     } catch (err) {
       console.error("Middleware error:", err)
@@ -60,8 +53,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Allow access to other routes
   return NextResponse.next()
+  */
 }
 
 export const config = {

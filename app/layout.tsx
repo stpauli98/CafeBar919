@@ -14,7 +14,7 @@ const cinzel = Cinzel({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.caffebar919.com"),
+  metadataBase: new URL("https://www.919bar.com"),
   title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
   description:
     "Kafa po danu, ritam po noći. Caffe Bar 919 — topao, elegantan ambijent, posebna ponuda pića i događaji uživo. Adresa, radno vrijeme, rezervacije.",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "sr_RS",
-    url: "https://www.caffebar919.com",
+    url: "https://www.919bar.com",
     siteName: "Caffe Bar 919",
     title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
     description: "Kafa po danu, ritam po noći. Mjesto gdje se elegancija i dobra atmosfera sreću.",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
         url: "/images/loadingImage.webp",
         width: 1200,
         height: 630,
-        alt: "Caffe Bar 919",
+        alt: "Caffe Bar 919 — ulaz u lokal",
       },
     ],
   },
