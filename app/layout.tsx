@@ -6,6 +6,7 @@ import { Cinzel } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
+import { LoadingScreen } from "@/components/loading-screen"
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${cinzel.variable}`}>
+        <LoadingScreen />
         <Suspense fallback={null}>{children}</Suspense>
         <Analytics />
       </body>
