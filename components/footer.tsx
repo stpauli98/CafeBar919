@@ -1,9 +1,18 @@
 "use client"
 
+import { useLocomotiveScroll } from "@/components/locomotive-scroll-context"
+
 export function Footer() {
+  const { scroll } = useLocomotiveScroll()
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
-    if (element) {
+    if (element && scroll) {
+      scroll.scrollTo(element, {
+        duration: 1000,
+        easing: [0.25, 0.0, 0.35, 1.0],
+      })
+    } else if (element) {
       element.scrollIntoView({ behavior: "smooth" })
     }
   }

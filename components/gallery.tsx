@@ -2,19 +2,34 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { X } from "lucide-react"
+import { X, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const galleryImages = [
-  { src: "/images/entrance-exterior.png", alt: "Ulaz u Caffe Bar 919" },
-  { src: "/images/interior-seating.png", alt: "Unutrašnjost sa stolovima" },
-  { src: "/images/hero-bar.png", alt: "Bar sa pićima" },
-  { src: "/images/interior-floor.png", alt: "Detalj enterijera" },
-  { src: "/images/entrance-gate.png", alt: "Pogled kroz kapiju" },
-  { src: "/images/exterior-street.png", alt: "Vanjski izgled" },
+  { src: "/images/image1.webp", alt: "Elegantni bar sa modernim ambijentom" },
+  { src: "/images/image2.webp", alt: "Stilski detalji unutrašnjosti" },
+  { src: "/images/image3.webp", alt: "Ugodna atmosfera Caffe Bar 919" },
+  { src: "/images/interior-seating.webp", alt: "Unutrašnjost sa stolovima" },
+  { src: "/images/loadingImage.webp", alt: "Ulaz u Caffe Bar 919" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.42 (1).webp", alt: "Detalj enterijera" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.42 (2).webp", alt: "Prostor za opuštanje" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.42.webp", alt: "Bar i šank" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.43 (1).webp", alt: "Ambient kaffe bara" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.43 (2).webp", alt: "Moderna atmosfera" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.43 (3).webp", alt: "Detalji dekora" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.45 (1).webp", alt: "Vanjski izgled" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.45 (2).webp", alt: "Noćna atmosfera" },
+  { src: "/images/WhatsApp Image 2025-10-28 at 14.54.45.webp", alt: "Pogled kroz kapiju" },
 ]
+
+const INITIAL_DISPLAY_COUNT = 4
 
 export function Gallery() {
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  const [showAll, setShowAll] = useState(false)
+
+  const displayedImages = showAll ? galleryImages : galleryImages.slice(0, INITIAL_DISPLAY_COUNT)
+  const hasMoreImages = galleryImages.length > INITIAL_DISPLAY_COUNT
 
   return (
     <section id="galerija" className="py-24 bg-[#1F1F1F]">
@@ -30,7 +45,7 @@ export function Gallery() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {galleryImages.map((image, index) => (
+          {displayedImages.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
@@ -49,6 +64,19 @@ export function Gallery() {
             </button>
           ))}
         </div>
+
+        {hasMoreImages && !showAll && (
+          <div className="flex justify-center mt-12">
+            <Button
+              onClick={() => setShowAll(true)}
+              variant="outline"
+              className="border-[#D3B574] text-[#D3B574] hover:bg-[#D3B574]/10 px-8 py-6 text-lg group"
+            >
+              Prikaži više
+              <ChevronDown className="ml-2 transition-transform duration-300 group-hover:translate-y-1" size={20} />
+            </Button>
+          </div>
+        )}
       </div>
 
       {selectedImage !== null && (

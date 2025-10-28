@@ -3,11 +3,19 @@
 import { Button } from "@/components/ui/button"
 import { ArrowDown } from "lucide-react"
 import Image from "next/image"
+import { useLocomotiveScroll } from "@/components/locomotive-scroll-context"
 
 export function Hero() {
+  const { scroll } = useLocomotiveScroll()
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
-    if (element) {
+    if (element && scroll) {
+      scroll.scrollTo(element, {
+        duration: 1000,
+        easing: [0.25, 0.0, 0.35, 1.0],
+      })
+    } else if (element) {
       element.scrollIntoView({ behavior: "smooth" })
     }
   }
@@ -16,7 +24,7 @@ export function Hero() {
     <section id="početna" className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-bar.png"
+          src="/images/image1.webp"
           alt="Caffe Bar 919 interior"
           fill
           sizes="100vw"

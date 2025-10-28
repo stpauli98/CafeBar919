@@ -3,22 +3,38 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
+import { useLocomotiveScroll } from "@/components/locomotive-scroll-context"
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { scroll, isReady, onScroll } = useLocomotiveScroll()
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+    if (!isReady) return
+
+    // Use Locomotive Scroll's scroll event instead of window.scrollY
+    const handleScroll = (args: { scroll: { x: number; y: number } }) => {
+      setIsScrolled(args.scroll.y > 20)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+
+    // Register callback and get cleanup function
+    const unsubscribe = onScroll(handleScroll)
+
+    return unsubscribe
+  }, [isReady, onScroll])
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
-    if (element) {
+    if (element && scroll) {
+      // Use Locomotive's scrollTo method for smooth integration
+      scroll.scrollTo(element, {
+        duration: 1000,
+        easing: [0.25, 0.0, 0.35, 1.0],
+      })
+      setIsMobileMenuOpen(false)
+    } else if (element) {
+      // Fallback to native scroll if Locomotive isn't ready
       element.scrollIntoView({ behavior: "smooth" })
       setIsMobileMenuOpen(false)
     }

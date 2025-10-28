@@ -14,9 +14,10 @@ export function LoadingScreen() {
       setShowContent(true)
     }, 100)
 
-    // Start fade out animation
+    // Start fade out animation after 3 seconds
     const fadeTimer = setTimeout(() => {
       setIsAnimating(true)
+      // Remove from DOM after fade completes
       setTimeout(() => {
         setIsVisible(false)
       }, 500)
@@ -40,7 +41,7 @@ export function LoadingScreen() {
       <div className="absolute inset-0">
         <div className="relative w-full h-full">
           <Image
-            src="/images/loadingImage.jpeg"
+            src="/images/loadingImage.webp"
             alt="Caffe Bar 919 Entrance"
             fill
             className="object-cover"

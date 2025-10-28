@@ -8,7 +8,7 @@ export function About() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative h-[500px] rounded-lg overflow-hidden">
             <Image
-              src="/images/interior-seating.png"
+              src="/images/interior-seating.webp"
               alt="Interior Caffe Bar 919"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: "Kafa po danu, ritam po noći. Mjesto gdje se elegancija i dobra atmosfera sreću.",
     images: [
       {
-        url: "/images/entrance-exterior.png",
+        url: "/images/loadingImage.webp",
         width: 1200,
         height: 630,
         alt: "Caffe Bar 919",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Caffe Bar 919 — elegantno utočište u srcu Gradiške",
     description: "Kafa po danu, ritam po noći. Mjesto gdje se elegancija i dobra atmosfera sreću.",
-    images: ["/images/entrance-exterior.png"],
+    images: ["/images/loadingImage.webp"],
   },
   robots: {
     index: true,
