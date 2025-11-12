@@ -39,8 +39,21 @@ export default function AdminEventsPage() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
+    // Check authentication on mount
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push("/admin/login")
+        return
+      }
+    }
+
+    checkAuth()
     fetchAllEvents()
-  }, [])
+  }, [router])
 
   async function fetchAllEvents() {
     try {
@@ -109,6 +122,17 @@ export default function AdminEventsPage() {
     setIsSaving(true)
 
     try {
+      // Get auth session for token
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        alert("Sesija je istekla. Molimo prijavite se ponovo.")
+        router.push("/admin/login")
+        return
+      }
+
       const url = editingEvent ? `/api/events/${editingEvent.id}` : "/api/events"
       const method = editingEvent ? "PATCH" : "POST"
 
@@ -126,6 +150,7 @@ export default function AdminEventsPage() {
         method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(body),
       })
@@ -150,8 +175,22 @@ export default function AdminEventsPage() {
     }
 
     try {
+      // Get auth session for token
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        alert("Sesija je istekla. Molimo prijavite se ponovo.")
+        router.push("/admin/login")
+        return
+      }
+
       const response = await fetch(`/api/events/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       })
 
       if (!response.ok) {
