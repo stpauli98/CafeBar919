@@ -25,15 +25,12 @@ export default function AdminLoginPage() {
       })
 
       if (signInError) {
-        console.error("Sign in error:", signInError)
         setError("Neispravna email adresa ili lozinka")
         setIsLoading(false)
         return
       }
 
       if (data.session) {
-        console.log("Login successful, session:", data.session.access_token.substring(0, 20) + "...")
-
         // Wait a bit for cookies to be set before redirecting
         await new Promise((resolve) => setTimeout(resolve, 500))
 
@@ -43,8 +40,7 @@ export default function AdminLoginPage() {
         setError("Sesija nije kreirana. Pokušajte ponovo.")
         setIsLoading(false)
       }
-    } catch (err) {
-      console.error("Login error:", err)
+    } catch {
       setError("Greška pri prijavljivanju. Pokušajte ponovo.")
       setIsLoading(false)
     }

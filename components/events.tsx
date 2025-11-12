@@ -26,8 +26,7 @@ export function Events() {
         const data = await response.json()
         setEvents(data.events || [])
         setError(null)
-      } catch (err) {
-        console.error("Error fetching events:", err)
+      } catch {
         setError("Nije moguće učitati događaje. Pokušajte ponovo kasnije.")
       } finally {
         setIsLoading(false)

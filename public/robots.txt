@@ -1,0 +1,17 @@
+# robots.txt for Caffe Bar 919
+# https://www.919bar.com
+
+# Allow all crawlers to access public pages
+User-agent: *
+Allow: /
+
+# Block admin pages from being indexed
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://www.919bar.com/sitemap.xml
+
+# Crawl-delay (optional, helps reduce server load)
+# User-agent: *
+# Crawl-delay: 10

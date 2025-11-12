@@ -18,38 +18,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-// Server-side Supabase client for admin operations (database queries)
-// Lazy initialization to avoid browser errors
-let _supabaseAdmin: ReturnType<typeof createClient> | null = null
-
-export function getSupabaseAdmin() {
-  if (typeof window !== "undefined") {
-    throw new Error("supabaseAdmin can only be used on the server side")
-  }
-
-  if (!_supabaseAdmin) {
-    _supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    })
-  }
-
-  return _supabaseAdmin
-}
-
-// Deprecated: Use getSupabaseAdmin() instead
-// Keeping for backward compatibility with existing code
-export const supabaseAdmin =
-  typeof window === "undefined"
-    ? createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY || "", {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      })
-    : null
+// Note: Service role key removed for security
+// All operations now go through authenticated user context with RLS policies
 
 // Types for events table
 export interface Event {

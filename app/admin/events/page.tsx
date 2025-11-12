@@ -67,8 +67,7 @@ export default function AdminEventsPage() {
       const data = await response.json()
       setEvents(data.events || [])
       setError(null)
-    } catch (err) {
-      console.error("Error fetching events:", err)
+    } catch {
       setError("Nije moguće učitati događaje. Pokušajte ponovo kasnije.")
     } finally {
       setIsLoading(false)
@@ -161,8 +160,7 @@ export default function AdminEventsPage() {
 
       await fetchAllEvents()
       closeModal()
-    } catch (err) {
-      console.error("Error saving event:", err)
+    } catch {
       alert("Greška pri čuvanju događaja. Pokušajte ponovo.")
     } finally {
       setIsSaving(false)
@@ -198,8 +196,7 @@ export default function AdminEventsPage() {
       }
 
       await fetchAllEvents()
-    } catch (err) {
-      console.error("Error deleting event:", err)
+    } catch {
       alert("Greška pri brisanju događaja. Pokušajte ponovo.")
     }
   }
@@ -209,8 +206,7 @@ export default function AdminEventsPage() {
       await supabase.auth.signOut()
       router.push("/admin/login")
       router.refresh()
-    } catch (err) {
-      console.error("Logout error:", err)
+    } catch {
       alert("Greška pri odjavljivanju.")
     }
   }

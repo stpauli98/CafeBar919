@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { type EventUpdate } from "@/lib/supabase"
 import { createClient } from "@supabase/supabase-js"
 
+// Note: console.error is kept in API routes for server-side logging
+// These logs go to production server logs (Vercel logs, etc.) and are needed for debugging
+
 // Helper function to verify authentication
 async function verifyAuth(request: NextRequest) {
   const authHeader = request.headers.get("authorization")

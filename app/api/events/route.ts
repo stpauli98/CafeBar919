@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { supabase, type EventInsert } from "@/lib/supabase"
 import { createClient } from "@supabase/supabase-js"
 
+// Note: console.error is kept in API routes for server-side logging
+// These logs go to production server logs (Vercel logs, etc.) and are needed for debugging
+
 // GET /api/events - List all active events
 export async function GET() {
   try {
