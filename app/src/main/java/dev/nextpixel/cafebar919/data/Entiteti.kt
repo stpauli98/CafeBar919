@@ -79,13 +79,13 @@ data class RazlogE(
 @Entity(tableName = "postavke")
 data class PostavkeE(
     @PrimaryKey val id: Int = 1,
-    @ColumnInfo(name = "rok_bez_pina_s") val rokBezPinaS: Int,
-    @ColumnInfo(name = "istorija_dana") val istorijaDana: Int,
-    @ColumnInfo(name = "zakljucavanje_s") val zakljucavanjeS: Int,
-    @ColumnInfo(name = "ispomoc_dozvoljena") val ispomocDozvoljena: Boolean,
+    @ColumnInfo(name = "rok_bez_pina_s") val rokBezPinaS: Int = 60,
+    @ColumnInfo(name = "istorija_dana") val istorijaDana: Int = 30,
+    @ColumnInfo(name = "zakljucavanje_s") val zakljucavanjeS: Int = 120,
+    @ColumnInfo(name = "ispomoc_dozvoljena") val ispomocDozvoljena: Boolean = true,
     @ColumnInfo(name = "pin_hes") val pinHes: String,
     @ColumnInfo(name = "pin_so") val pinSo: String,
-    @ColumnInfo(name = "pin_probni") val pinProbni: Boolean,
+    @ColumnInfo(name = "pin_probni") val pinProbni: Boolean = true,
     @ColumnInfo(name = "pin_pogresnih_zaredom") val pinPogresnihZaredom: Int = 0,
     @ColumnInfo(name = "pin_blokiran_do") val pinBlokiranDo: Long? = null,
 )
@@ -118,7 +118,7 @@ data class NocPrimalacE(
     tableName = "tura",
     foreignKeys = [
         ForeignKey(NocE::class, ["id"], ["noc_id"], onDelete = ForeignKey.CASCADE),
-        ForeignKey(NocPrimalacE::class, ["id"], ["primalac_id"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(NocPrimalacE::class, ["id"], ["primalac_id"]),
     ],
     indices = [Index("noc_id"), Index("primalac_id"), Index("kljuc", unique = true)],
 )
@@ -145,8 +145,10 @@ data class StavkaTureE(
     @ColumnInfo(name = "tura_id") val turaId: Long,
     @ColumnInfo(name = "artikal_id") val artikalId: Long,
     @ColumnInfo(name = "artikal_naziv") val artikalNaziv: String,
+    @ColumnInfo(name = "artikal_redoslijed") val artikalRedoslijed: Int,
     @ColumnInfo(name = "kategorija_id") val kategorijaId: Long,
     @ColumnInfo(name = "kategorija_naziv") val kategorijaNaziv: String,
+    @ColumnInfo(name = "kategorija_redoslijed") val kategorijaRedoslijed: Int,
     @ColumnInfo(name = "mjera_id") val mjeraId: Long,
     @ColumnInfo(name = "mjera_naziv") val mjeraNaziv: String,
     @ColumnInfo(name = "mjera_natpis") val mjeraNatpis: String,
@@ -157,10 +159,16 @@ data class StavkaTureE(
 )
 
 /** Jedan red (`id` = 1): nepotvrđena tura koja preživljava restart. */
-@Entity(tableName = "nacrt_ture")
+@Entity(
+    tableName = "nacrt_ture",
+    foreignKeys = [ForeignKey(NocPrimalacE::class, ["id"], ["primalac_id"], onDelete = ForeignKey.SET_NULL)],
+    indices = [Index("primalac_id")],
+)
 data class NacrtTureE(
     @PrimaryKey val id: Int = 1,
     @ColumnInfo(name = "primalac_id") val primalacId: Long?,
+    /** UUID koji se pri potvrdi upisuje u `tura.kljuc`. */
+    val kljuc: String,
     /** JSON lista stavki. */
     val stavke: String = "[]",
     @ColumnInfo(name = "izmijenjen_u") val izmijenjenU: Long,

@@ -74,7 +74,7 @@ fun BazaGreskaEkran(onPonovo: () -> Unit) {
                 ) {
                     Text("Pokušaj ponovo", color = Boje.onPrimary, style = Tekst.body.copy(fontWeight = FontWeight.Bold))
                 }
-                Text("Pomoć: NextPixel · +387 66 603 900", color = Boje.primary, style = Tekst.body, textAlign = TextAlign.Center)
+                Text("Pomoć: NextPixel · +387 66 603 900", color = Boje.muted, style = Tekst.body, textAlign = TextAlign.Center)
                 Text("Šifra: BAZA-01", color = Boje.muted, style = Tekst.caption, textAlign = TextAlign.Center)
             }
         }

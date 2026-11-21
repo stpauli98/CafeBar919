@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "308432c821a6f39379e31445099b10e8",
+    "identityHash": "b508082483436c09d51b50728a007f3e",
     "entities": [
       {
         "tableName": "kategorija",
@@ -482,7 +482,7 @@
       },
       {
         "tableName": "tura",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noc_id` INTEGER NOT NULL, `primalac_id` INTEGER NOT NULL, `potvrdjena_u` INTEGER NOT NULL, `kljuc` TEXT NOT NULL, `ponistena_u` INTEGER, `ponistena_bez_pina` INTEGER NOT NULL, `razlog_tekst` TEXT, FOREIGN KEY(`noc_id`) REFERENCES `noc`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`primalac_id`) REFERENCES `noc_primalac`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noc_id` INTEGER NOT NULL, `primalac_id` INTEGER NOT NULL, `potvrdjena_u` INTEGER NOT NULL, `kljuc` TEXT NOT NULL, `ponistena_u` INTEGER, `ponistena_bez_pina` INTEGER NOT NULL, `razlog_tekst` TEXT, FOREIGN KEY(`noc_id`) REFERENCES `noc`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`primalac_id`) REFERENCES `noc_primalac`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -580,7 +580,7 @@
           },
           {
             "table": "noc_primalac",
-            "onDelete": "CASCADE",
+            "onDelete": "NO ACTION",
             "onUpdate": "NO ACTION",
             "columns": [
               "primalac_id"
@@ -593,7 +593,7 @@
       },
       {
         "tableName": "stavka_ture",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tura_id` INTEGER NOT NULL, `artikal_id` INTEGER NOT NULL, `artikal_naziv` TEXT NOT NULL, `kategorija_id` INTEGER NOT NULL, `kategorija_naziv` TEXT NOT NULL, `mjera_id` INTEGER NOT NULL, `mjera_naziv` TEXT NOT NULL, `mjera_natpis` TEXT NOT NULL, `mjera_u_zbiru` TEXT NOT NULL, `mjera_redoslijed` INTEGER NOT NULL, `litara` REAL, `kolicina` INTEGER NOT NULL, FOREIGN KEY(`tura_id`) REFERENCES `tura`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tura_id` INTEGER NOT NULL, `artikal_id` INTEGER NOT NULL, `artikal_naziv` TEXT NOT NULL, `artikal_redoslijed` INTEGER NOT NULL, `kategorija_id` INTEGER NOT NULL, `kategorija_naziv` TEXT NOT NULL, `kategorija_redoslijed` INTEGER NOT NULL, `mjera_id` INTEGER NOT NULL, `mjera_naziv` TEXT NOT NULL, `mjera_natpis` TEXT NOT NULL, `mjera_u_zbiru` TEXT NOT NULL, `mjera_redoslijed` INTEGER NOT NULL, `litara` REAL, `kolicina` INTEGER NOT NULL, FOREIGN KEY(`tura_id`) REFERENCES `tura`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -620,6 +620,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "artikalRedoslijed",
+            "columnName": "artikal_redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "kategorijaId",
             "columnName": "kategorija_id",
             "affinity": "INTEGER",
@@ -629,6 +635,12 @@
             "fieldPath": "kategorijaNaziv",
             "columnName": "kategorija_naziv",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kategorijaRedoslijed",
+            "columnName": "kategorija_redoslijed",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -706,7 +718,7 @@
       },
       {
         "tableName": "nacrt_ture",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `primalac_id` INTEGER, `stavke` TEXT NOT NULL, `izmijenjen_u` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `primalac_id` INTEGER, `kljuc` TEXT NOT NULL, `stavke` TEXT NOT NULL, `izmijenjen_u` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`primalac_id`) REFERENCES `noc_primalac`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -718,6 +730,12 @@
             "fieldPath": "primalacId",
             "columnName": "primalac_id",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kljuc",
+            "columnName": "kljuc",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "stavke",
@@ -737,12 +755,36 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_nacrt_ture_primalac_id",
+            "unique": false,
+            "columnNames": [
+              "primalac_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_nacrt_ture_primalac_id` ON `${TABLE_NAME}` (`primalac_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "noc_primalac",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "primalac_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '308432c821a6f39379e31445099b10e8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b508082483436c09d51b50728a007f3e')"
     ]
   }
 }

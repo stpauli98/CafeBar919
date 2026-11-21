@@ -1,5 +1,6 @@
 package dev.nextpixel.cafebar919.data
 
+import android.util.Log
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ class OtvaranjeBaze(private val otvori: suspend () -> AppDatabase) {
             db?.close()
             throw e
         } catch (e: Exception) {
+            Log.e("CafeBar919", "Baza se nije otvorila", e)
             db?.close()
             _stanje.value = StanjeBaze.Greska(e)
         }
