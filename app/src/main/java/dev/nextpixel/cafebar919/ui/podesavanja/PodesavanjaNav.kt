@@ -23,6 +23,8 @@ import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliViewModel
 import dev.nextpixel.cafebar919.ui.podesavanja.kategorije.KategorijeEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.kategorije.KategorijeViewModel
+import dev.nextpixel.cafebar919.ui.podesavanja.ljudi.LjudiEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.ljudi.LjudiViewModel
 import dev.nextpixel.cafebar919.ui.podesavanja.mjere.MjereEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.mjere.MjereViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,6 +36,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.nextpixel.cafebar919.AppContainer
 import dev.nextpixel.cafebar919.repo.BrojaciMenija
+import dev.nextpixel.cafebar919.ui.podesavanja.pravila.PravilaEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.pravila.PravilaViewModel
 import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -117,7 +121,8 @@ private fun RadniDio(sekcija: Sekcija, container: AppContainer, toast: ToastStan
         Sekcija.ARTIKLI -> ArtikliEkran(viewModel(factory = ArtikliViewModel.Fabrika(container)), toast)
         Sekcija.KATEGORIJE -> KategorijeEkran(viewModel(factory = KategorijeViewModel.Fabrika(container)), toast)
         Sekcija.MJERE -> MjereEkran(viewModel(factory = MjereViewModel.Fabrika(container)), toast)
-        Sekcija.LJUDI,
-        Sekcija.PRAVILA, Sekcija.PIN, Sekcija.O_APLIKACIJI -> Unit
+        Sekcija.LJUDI -> LjudiEkran(viewModel(factory = LjudiViewModel.Fabrika(container)), toast)
+        Sekcija.PRAVILA -> PravilaEkran(viewModel(factory = PravilaViewModel.Fabrika(container)), toast)
+        Sekcija.PIN, Sekcija.O_APLIKACIJI -> Unit
     }
 }

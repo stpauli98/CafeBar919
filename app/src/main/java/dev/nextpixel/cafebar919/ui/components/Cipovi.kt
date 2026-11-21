@@ -2,6 +2,7 @@ package dev.nextpixel.cafebar919.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +45,8 @@ fun Cip(
     modifier: Modifier = Modifier,
     omogucen: Boolean = true,
     kvacica: Boolean = true,
+    ukloni: (() -> Unit)? = null,
+    opisUklanjanja: String? = null,
 ) {
     val pozadina = when {
         !omogucen -> Boje.disabledBg
@@ -59,13 +65,24 @@ fun Cip(
             .clip(Oblici.md)
             .background(pozadina)
             .border(1.5.dp, okvir, Oblici.md)
-            .selectable(selected = izabran, enabled = omogucen, role = Role.Button, onClick = onClick)
-            .padding(horizontal = Razmaci.s4),
+            // Čip sa „×“ nije izbor (V6): dodirna je samo „×“, pa cijeli čip nije selectable.
+            .then(if (ukloni == null) Modifier.selectable(selected = izabran, enabled = omogucen, role = Role.Button, onClick = onClick) else Modifier)
+            .padding(start = Razmaci.s4, end = if (ukloni == null) Razmaci.s4 else 0.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
     ) {
         if (izabran && kvacica) Icon(Icons.Rounded.Check, null, Modifier.size(18.dp), tint = boja)
         Text(tekst, style = TekstCipa, color = boja)
+        if (ukloni != null) {
+            // Zona 40×56 oko glifa 16 (dodir po visini 56).
+            Box(
+                Modifier
+                    .size(40.dp, Razmaci.dodir)
+                    .semantics { contentDescription = opisUklanjanja ?: "Ukloni" }
+                    .clickable(role = Role.Button, onClick = ukloni),
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Rounded.Close, null, Modifier.size(16.dp), tint = Boje.muted) }
+        }
     }
 }
 

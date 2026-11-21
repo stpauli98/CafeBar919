@@ -26,13 +26,13 @@ import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.Razmaci
 import dev.nextpixel.cafebar919.ui.theme.Tekst
 
-/** Zaglavlje radnog dijela V4/V5 (Paper): naslov 22/800, podnaslov 14/20 sivo, zlatno dugme desno. */
+/** Zaglavlje radnog dijela V4/V5 (Paper): naslov 22/800, podnaslov 14/20 sivo (V2 ga nema: prazan), zlatno dugme desno. */
 @Composable
 internal fun ZaglavljeSekcije(naslov: String, podnaslov: String, dugme: String, onDugme: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(naslov, color = Boje.ink, style = Tekst.body.copy(fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.ExtraBold))
-            Text(podnaslov, color = Boje.muted, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 20.sp))
+            if (podnaslov.isNotEmpty()) Text(podnaslov, color = Boje.muted, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 20.sp))
         }
         GlavnoDugme(dugme, onDugme, ikona = Icons.Rounded.Add)
     }
