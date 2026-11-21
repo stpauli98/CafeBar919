@@ -4,6 +4,7 @@ import android.content.Context
 import dev.nextpixel.cafebar919.data.AppDatabase
 import dev.nextpixel.cafebar919.data.OtvaranjeBaze
 import dev.nextpixel.cafebar919.data.StanjeBaze
+import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,17 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         val stanje = otvaranjeBaze.stanje.value
         check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
         return PodesavanjaRepo(stanje.db, clock).also { podesavanjaRepo = it }
+    }
+
+    private var pinServis: PinServis? = null
+
+    /** Pravi PIN servis jednom, tek kad je baza spremna. */
+    @Synchronized
+    fun pin(): PinServis {
+        pinServis?.let { return it }
+        val stanje = otvaranjeBaze.stanje.value
+        check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
+        return PinServis(stanje.db, clock).also { pinServis = it }
     }
 
     init {
