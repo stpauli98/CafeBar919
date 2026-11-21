@@ -17,6 +17,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import dev.nextpixel.cafebar919.data.AppDatabase
@@ -170,6 +173,36 @@ class ArtikliTest {
         compose.onNodeWithText("Sačuvaj artikal").assertExists()
         compose.onNode(hasSetTextAction() and hasText("smirnoff")).assertExists()
         assertEquals(1, redoslijedNaziva().size)
+    }
+
+    @Test fun duplikatSeJavljaPoslijeIzlaskaIzPoljaBezCuvanja() {
+        val zestina = kategorija("Žestina")
+        artikal("Smirnoff", zestina, "Doza")
+        prikazi()
+        cekaj("Novi artikal")
+        compose.onNodeWithText("Novi artikal").performClick()
+        cekaj("Sačuvaj artikal")
+        compose.onNode(hasSetTextAction()).performClick() // fokus u polje
+        unesiNaziv("smirnoff")
+        assertFalse(postoji("Taj naziv već postoji · ARTIKAL-01")) // dok se kuca, nema greške
+        compose.onNode(hasSetTextAction()).performKeyInput { pressKey(Key.Tab) } // fokus napušta polje
+        cekaj("Taj naziv već postoji · ARTIKAL-01")
+    }
+
+    @Test fun odbijenoCuvanjePrikazujeSeUProzoru() {
+        val zestina = kategorija("Žestina")
+        prikazi()
+        cekaj("Novi artikal")
+        compose.onNodeWithText("Novi artikal").performClick()
+        cekaj("Sačuvaj artikal")
+        unesiNaziv("Viljamovka")
+        compose.onNodeWithTag("kategorija:Žestina").performClick()
+        compose.onNodeWithTag("mjera:Doza").performClick()
+        repoPoziv { assertEquals(Ishod.Ok, repo.postaviAktivnaKategorija(zestina, false)) }
+        compose.onNodeWithText("Sačuvaj artikal").performClick()
+        cekaj("Prvo uključi kategoriju Žestina.")
+        compose.onNodeWithText("Sačuvaj artikal").assertIsEnabled() // prozor ostaje otvoren sa unosom
+        assertTrue(redoslijedNaziva().isEmpty())
     }
 
     @Test fun iskljucivanjeTraziPotvrdu() {

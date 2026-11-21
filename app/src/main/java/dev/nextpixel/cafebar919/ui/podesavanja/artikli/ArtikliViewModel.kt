@@ -36,6 +36,8 @@ data class ArtikalForma(
     val mjereIds: Set<Long> = emptySet(),
     val pocetna: Pocetna = Pocetna(),
     val greskaNaziv: String? = null,
+    /** Odbijeno čuvanje koje nije o nazivu (npr. isključena kategorija); prikazuje se iznad dugmadi. */
+    val greska: String? = null,
     /** V1.2: „Promjena važi od sljedeće ture…“, samo kad artikal ima unose u aktivnoj noći. */
     val napomena: String? = null,
     val potvrdaOdbacivanja: Boolean = false,
@@ -153,15 +155,15 @@ class ArtikliViewModel(private val repo: PodesavanjaRepo) : ViewModel() {
         }
     }
 
-    fun promijeniNaziv(naziv: String) = izmijeni { it.copy(naziv = naziv, greskaNaziv = null) }
+    fun promijeniNaziv(naziv: String) = izmijeni { it.copy(naziv = naziv, greskaNaziv = null, greska = null) }
 
-    fun izaberiKategoriju(id: Long) = izmijeni { it.copy(kategorijaId = id) }
+    fun izaberiKategoriju(id: Long) = izmijeni { it.copy(kategorijaId = id, greska = null) }
 
     fun prebaciMjeru(id: Long) = izmijeni { f ->
         when {
-            id in f.mjereIds -> f.copy(mjereIds = f.mjereIds - id)
+            id in f.mjereIds -> f.copy(mjereIds = f.mjereIds - id, greska = null)
             f.mjereIds.size >= NAJVISE_MJERA -> f
-            else -> f.copy(mjereIds = f.mjereIds + id)
+            else -> f.copy(mjereIds = f.mjereIds + id, greska = null)
         }
     }
 
@@ -183,10 +185,11 @@ class ArtikliViewModel(private val repo: PodesavanjaRepo) : ViewModel() {
                     _poruke.emit("Sačuvano: ${Validacija.ocisti(f.naziv)}")
                 }
                 is Ishod.Odbijeno -> {
-                    _prozor.update { it?.copy(upis = false) }
-                    when (ishod.razlog) {
-                        Odbijanje.NAZIV_POSTOJI -> _prozor.update { it?.copy(greskaNaziv = GRESKA_NAZIV_POSTOJI) }
-                        else -> poruka(ishod.razlog, null, f)?.let { _poruke.emit(it) }
+                    // Odbijanje se prikazuje u prozoru (toast bi bio iza scrima) i nikad se ne guta.
+                    val tekst = poruka(ishod.razlog, null, f) ?: "Čuvanje nije uspjelo."
+                    _prozor.update {
+                        if (ishod.razlog == Odbijanje.NAZIV_POSTOJI) it?.copy(upis = false, greskaNaziv = tekst)
+                        else it?.copy(upis = false, greska = tekst)
                     }
                 }
             }

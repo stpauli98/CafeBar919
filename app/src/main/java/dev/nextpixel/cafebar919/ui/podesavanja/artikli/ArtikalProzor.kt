@@ -132,7 +132,14 @@ fun ArtikalProzor(forma: ArtikalForma, kategorije: List<KategorijaE>, mjere: Lis
             }
         },
         dugmad = {
-            if (forma.napomena != null) {
+            if (forma.greska != null) {
+                Text(
+                    forma.greska,
+                    Modifier.weight(1f),
+                    color = Boje.danger,
+                    style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 20.sp),
+                )
+            } else if (forma.napomena != null) {
                 Text(
                     forma.napomena,
                     Modifier.weight(1f),
