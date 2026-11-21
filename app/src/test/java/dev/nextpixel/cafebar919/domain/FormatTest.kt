@@ -44,5 +44,15 @@ class FormatTest {
         assertEquals("0 s", Format.odbrojavanje(0))
     }
 
+    @Test fun brisanjeNoci_cijelaRecenicaSlazeSeSaBrojem() {
+        assertEquals("1 noć starija od 19 dana biće obrisana pri sljedećem pokretanju.", Format.brisanjeNoci(1, 19))
+        assertEquals("2 noći starije od 19 dana biće obrisane pri sljedećem pokretanju.", Format.brisanjeNoci(2, 19))
+        assertEquals("4 noći starije od 19 dana biće obrisane pri sljedećem pokretanju.", Format.brisanjeNoci(4, 19))
+        // Množina prema spec 7 #33.
+        assertEquals("5 noći starijih od 19 dana biće obrisano pri sljedećem pokretanju.", Format.brisanjeNoci(5, 19))
+        assertEquals("11 noći starijih od 19 dana biće obrisano pri sljedećem pokretanju.", Format.brisanjeNoci(11, 19))
+        assertEquals("21 noć starija od 19 dana biće obrisana pri sljedećem pokretanju.", Format.brisanjeNoci(21, 19))
+    }
+
     @Test fun datumNoci() { assertEquals("Subota 21. 11.", Format.datumNoci(LocalDate.of(2026, 11, 21))) }
 }

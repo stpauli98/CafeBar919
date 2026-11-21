@@ -285,7 +285,7 @@ class LjudiPravilaTest {
         cekaj("20 dana")
         minus(1).performClick()
         cekaj("Obrisati stare noći?")
-        compose.onNodeWithText("1 noć starijih od 19 dana biće obrisano pri sljedećem pokretanju.").assertExists()
+        compose.onNodeWithText("1 noć starija od 19 dana biće obrisana pri sljedećem pokretanju.").assertExists()
         compose.onNodeWithText("Nastavi unos").performClick()
         cekajNestanak("Obrisati stare noći?")
         assertTrue(postoji("20 dana"))

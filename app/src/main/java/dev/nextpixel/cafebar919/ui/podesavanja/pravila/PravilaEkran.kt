@@ -83,7 +83,7 @@ fun PravilaEkran(vm: PravilaViewModel, toast: ToastStanje) {
             sirina = 460.dp,
             sadrzaj = {
                 Text(
-                    "${Format.brojac(t.noci, "noć", "noći", "noći")} starijih od ${t.dana} dana biće obrisano pri sljedećem pokretanju.",
+                    Format.brisanjeNoci(t.noci, t.dana),
                     color = Boje.muted,
                     style = Tekst.body.copy(fontSize = 16.sp, lineHeight = 24.sp),
                 )

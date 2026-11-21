@@ -20,6 +20,13 @@ object Format {
 
     fun brojac(n: Int, jedan: String, dva: String, pet: String): String = "$n ${mnozina(n, jedan, dva, pet)}"
 
+    /** Potvrda smanjenja istorije (spec 7 #33); imenica, pridjev i glagol slažu se sa brojem noći. */
+    fun brisanjeNoci(noci: Int, dana: Int): String {
+        val pridjev = mnozina(noci, "starija", "starije", "starijih")
+        val glagol = mnozina(noci, "obrisana", "obrisane", "obrisano")
+        return "${brojac(noci, "noć", "noći", "noći")} $pridjev od $dana dana biće $glagol pri sljedećem pokretanju."
+    }
+
     fun litre(l: Double): String =
         BigDecimal.valueOf(l).setScale(2, RoundingMode.HALF_UP).toPlainString().replace('.', ',')
 
