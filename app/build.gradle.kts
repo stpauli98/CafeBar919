@@ -20,9 +20,27 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val storeFile = providers.gradleProperty("CAFEBAR_STORE_FILE").orNull
+            val storePassword = providers.gradleProperty("CAFEBAR_STORE_PASSWORD").orNull
+            val keyAlias = providers.gradleProperty("CAFEBAR_KEY_ALIAS").orNull
+            val keyPassword = providers.gradleProperty("CAFEBAR_KEY_PASSWORD").orNull
+            if (storeFile != null && storePassword != null && keyAlias != null && keyPassword != null) {
+                this.storeFile = file(storeFile)
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
