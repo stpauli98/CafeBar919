@@ -17,6 +17,15 @@ class ValidacijaTest {
         assertEquals(Ishod.Ok, Validacija.provjeriLitre(null))
     }
 
+    @Test fun litre_beskonacnoSeOdbija_bezIzuzetka() {
+        listOf("1e400", "-1e400", "9".repeat(400)).forEach { unos ->
+            val l = Validacija.parsirajLitre(unos)!!
+            assertEquals(unos, Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA), Validacija.provjeriLitre(l))
+        }
+        assertEquals(Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA), Validacija.provjeriLitre(Double.POSITIVE_INFINITY))
+        assertEquals(Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA), Validacija.provjeriLitre(Double.NEGATIVE_INFINITY))
+    }
+
     @Test fun naziv() {
         assertEquals("Jack Daniel’s", Validacija.ocisti("  Jack   Daniel’s "))
         assertEquals(Validacija.kljucNaziva("JACK daniel’s"), Validacija.kljucNaziva(" Jack Daniel’s"))

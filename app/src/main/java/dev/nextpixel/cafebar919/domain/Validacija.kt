@@ -25,12 +25,12 @@ object Validacija {
         val t = tekst.trim()
         if (t.isEmpty()) return null
         val broj = t.replace(',', '.').toBigDecimalOrNull() ?: return Double.NaN
-        return broj.setScale(2, RoundingMode.HALF_UP).toDouble()
+        return broj.setScale(2, RoundingMode.HALF_UP).toDouble().takeIf { it.isFinite() } ?: Double.NaN
     }
 
     fun provjeriLitre(l: Double?): Ishod {
         if (l == null) return Ishod.Ok
-        if (l.isNaN()) return Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA)
+        if (!l.isFinite()) return Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA)
         val v = BigDecimal.valueOf(l)
         return if (v >= BigDecimal("0.01") && v <= BigDecimal("5.00")) Ishod.Ok
         else Ishod.Odbijeno(Odbijanje.LITRE_VAN_OPSEGA)
