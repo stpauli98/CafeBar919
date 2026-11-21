@@ -19,6 +19,15 @@ class FormatTest {
         assertEquals("1,00", Format.litre(1.0))
     }
 
+    @Test fun oznakaMjere_nazivBezKolicineIzNazivaPaLitreIzMjere() {
+        assertEquals("Doza 0,03", Format.oznakaMjere("Doza", 0.03, false))
+        assertEquals("Boca 0,70 l", Format.oznakaMjere("Boca 0,7", 0.70, true))
+        assertEquals("Boca 1,00 l", Format.oznakaMjere("Boca 1 l", 1.0, true))
+        assertEquals("Komad", Format.oznakaMjere("Komad", null, true))
+        assertEquals("Čaša vina 0,20 l", Format.oznakaMjere("Čaša vina", 0.2, true))
+        assertEquals("Boca 0,70", Format.oznakaMjere("Boca 0.7 l", 0.70, false))
+    }
+
     @Test fun zbirMjera_kratkoImePaBroj_poRedoslijedu_bezNula() {
         val s = listOf(Format.MjeraBroj("bok.", 2, 4), Format.MjeraBroj("kom", 0, 22), Format.MjeraBroj("doza", 1, 26), Format.MjeraBroj("boca 1 l", 4, 0))
         assertEquals("kom 22 · doza 26 · bok. 4", Format.zbirMjera(s))

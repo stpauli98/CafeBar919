@@ -8,7 +8,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.nextpixel.cafebar919.ui.components.ToastHost
+import dev.nextpixel.cafebar919.ui.components.ToastStanje
+import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
@@ -77,23 +89,29 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
         composable(RUTA_PODESAVANJA) { unos ->
             val sekcija = unos.arguments?.getString("sekcija")?.let { n -> Sekcija.entries.firstOrNull { it.name == n } } ?: Sekcija.ARTIKLI
             BackHandler { sesija.zakljucaj() }
-            Ljuska(
-                aktivna = sekcija,
-                onSekcija = { navController.navigate(rutaSekcije(it)) { popUpTo(RUTA_PODESAVANJA) { inclusive = true } } },
-                onNazad = { navController.popBackStack(RUTA_POCETNI, inclusive = false) },
-                sesija = sesija,
-                brojaci = brojaci,
-                probniPin = probni,
-            ) { RadniDio(sekcija) }
+            // Jedan toast za cijelo područje podešavanja, iznad radnog dijela.
+            val toast = remember { ToastStanje() }
+            Box(Modifier.fillMaxSize()) {
+                Ljuska(
+                    aktivna = sekcija,
+                    onSekcija = { navController.navigate(rutaSekcije(it)) { popUpTo(RUTA_PODESAVANJA) { inclusive = true } } },
+                    onNazad = { navController.popBackStack(RUTA_POCETNI, inclusive = false) },
+                    sesija = sesija,
+                    brojaci = brojaci,
+                    probniPin = probni,
+                ) { RadniDio(sekcija, container, toast) }
+                ToastHost(toast, Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp))
+            }
         }
     }
 }
 
 /** Jedino mjesto gdje se sekcije mapiraju na ekrane; taskovi 8–11 dopunjuju grane. */
 @Composable
-private fun RadniDio(sekcija: Sekcija) {
+private fun RadniDio(sekcija: Sekcija, container: AppContainer, toast: ToastStanje) {
     when (sekcija) {
-        Sekcija.ARTIKLI, Sekcija.KATEGORIJE, Sekcija.MJERE, Sekcija.LJUDI,
+        Sekcija.ARTIKLI -> ArtikliEkran(viewModel(factory = ArtikliViewModel.Fabrika(container)), toast)
+        Sekcija.KATEGORIJE, Sekcija.MJERE, Sekcija.LJUDI,
         Sekcija.PRAVILA, Sekcija.PIN, Sekcija.O_APLIKACIJI -> Unit
     }
 }

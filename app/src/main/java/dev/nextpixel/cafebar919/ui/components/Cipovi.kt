@@ -29,7 +29,10 @@ import dev.nextpixel.cafebar919.ui.theme.Tekst
 
 private val TekstCipa = Tekst.body.copy(fontSize = 15.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold)
 
-/** Čip za izbor (V1.1): izabran = zlatni tint i okvir, sa kvačicom. */
+/**
+ * Čip za izbor (Paper V1.1): radius 12, neizabran = tile podloga bez okvira, izabran = zlatni tint i okvir 1,5
+ * sa kvačicom 18, padding 16, razmak 6. Visina najmanje 56 (dodirna zona; Paper crta 48).
+ */
 @Composable
 fun Cip(
     tekst: String,
@@ -42,9 +45,9 @@ fun Cip(
     val pozadina = when {
         !omogucen -> Boje.disabledBg
         izabran -> Boje.primaryTint
-        else -> Color.Transparent
+        else -> Boje.tile
     }
-    val okvir = if (izabran && omogucen) Boje.primary else Boje.line
+    val okvir = if (izabran && omogucen) Boje.primary else Color.Transparent
     val boja = when {
         !omogucen -> Boje.disabledInk
         izabran -> Boje.primary
@@ -53,15 +56,15 @@ fun Cip(
     Row(
         modifier = modifier
             .heightIn(min = Razmaci.dodir)
-            .clip(Oblici.pill)
+            .clip(Oblici.md)
             .background(pozadina)
-            .border(1.5.dp, okvir, Oblici.pill)
+            .border(1.5.dp, okvir, Oblici.md)
             .selectable(selected = izabran, enabled = omogucen, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 18.dp),
+            .padding(horizontal = Razmaci.s4),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Razmaci.s2, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
     ) {
-        if (izabran && kvacica) Icon(Icons.Rounded.Check, null, Modifier.size(20.dp), tint = boja)
+        if (izabran && kvacica) Icon(Icons.Rounded.Check, null, Modifier.size(18.dp), tint = boja)
         Text(tekst, style = TekstCipa, color = boja)
     }
 }

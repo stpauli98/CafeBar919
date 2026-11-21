@@ -25,6 +25,15 @@ object Format {
 
     fun litreSaJedinicom(l: Double): String = "${litre(l)} l"
 
+    private val KOLICINA_NA_KRAJU = Regex("""\s+\d+([.,]\d+)?\s*l?$""")
+
+    /** Oznaka mjere na čipu (spec 7 #13): „Doza 0,03“ u listi, „Boca 0,70 l“ u prozoru; mjera bez litara samo naziv. */
+    fun oznakaMjere(naziv: String, litara: Double?, saJedinicom: Boolean): String {
+        if (litara == null) return naziv
+        val osnova = naziv.replace(KOLICINA_NA_KRAJU, "")
+        return "$osnova ${litre(litara)}" + if (saJedinicom) " l" else ""
+    }
+
     data class MjeraBroj(val uZbiru: String, val redoslijed: Int, val kolicina: Int)
 
     fun zbirMjera(stavke: List<MjeraBroj>): String {
