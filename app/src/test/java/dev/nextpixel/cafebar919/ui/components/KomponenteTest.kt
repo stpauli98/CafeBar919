@@ -97,6 +97,11 @@ class KomponenteTest {
         compose.onNodeWithContentDescription("Minus").assertIsEnabled()
     }
 
+    @Test fun stepper_prikazujeVrijednostSaJedinicom() {
+        compose.setContent { CafeBarTema { Stepper("60", "s", {}, {}, minusOmogucen = true, plusOmogucen = true) } }
+        compose.onNodeWithText("60 s").assertIsDisplayed()
+    }
+
     @Test fun segmentiraniIzbor_javljaIndeks() {
         var izbor = -1
         compose.setContent { CafeBarTema { SegmentiraniIzbor(listOf("Konobar", "Šank"), 0, { izbor = it }) } }

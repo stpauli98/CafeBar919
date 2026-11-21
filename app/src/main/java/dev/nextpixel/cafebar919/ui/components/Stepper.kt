@@ -20,7 +20,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,8 +48,8 @@ private fun StepperDugme(ikona: ImageVector, opis: String, omoguceno: Boolean, o
 }
 
 /**
- * Količina (O2): [−] broj [+], dugmad 56×56 bez okvira, broj 24/800 u širini 48, razmak 4.
- * `jedinica` ne crta se (Paper je ne prikazuje, mjera je u redu pored); koristi se samo za čitač ekrana.
+ * Količina (Paper V6 „Pravila rada“): [−] „60 s“ [+], razmak 8, dugmad 56×56 bez okvira, vrijednost
+ * (krem, 18/700, tabularni brojevi) i jedinica (muted, 500) u jednom tekstu širine 110, centrirano.
  */
 @Composable
 fun Stepper(
@@ -57,14 +60,22 @@ fun Stepper(
     minusOmogucen: Boolean,
     plusOmogucen: Boolean,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         StepperDugme(Icons.Rounded.Remove, "Minus", minusOmogucen, onMinus)
         Text(
-            vrijednost,
-            modifier = Modifier.width(48.dp).semantics { contentDescription = "$vrijednost $jedinica".trim() },
-            style = Tekst.section.copy(fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.sp),
+            buildAnnotatedString {
+                append(vrijednost)
+                if (jedinica.isNotEmpty()) {
+                    append(" ")
+                    withStyle(SpanStyle(color = Boje.muted, fontWeight = FontWeight.Medium)) { append(jedinica) }
+                }
+            },
+            modifier = Modifier.width(110.dp).semantics { contentDescription = "$vrijednost $jedinica".trim() },
+            style = Tekst.body.copy(
+                fontSize = 18.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold,
+                fontFeatureSettings = "tnum", textAlign = TextAlign.Center,
+            ),
             color = Boje.ink,
-            textAlign = TextAlign.Center,
         )
         StepperDugme(Icons.Rounded.Add, "Plus", plusOmogucen, onPlus)
     }
