@@ -6,9 +6,13 @@ import dev.nextpixel.cafebar919.data.OtvaranjeBaze
 import dev.nextpixel.cafebar919.data.StanjeBaze
 import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
+import dev.nextpixel.cafebar919.ui.podesavanja.PodesavanjaSesija
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Clock
 
@@ -41,8 +45,18 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         return PinServis(stanje.db, clock).also { pinServis = it }
     }
 
+    /** Posljednja vrijednost „zaključavanje_s“ iz postavki; 120 s dok baza nije spremna. */
+    private val zakljucavanjeS = MutableStateFlow(120)
+
+    /** Sesija podešavanja; živi koliko i aplikacija, odbrojava na glavnoj niti. */
+    val sesija = PodesavanjaSesija(CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)) { zakljucavanjeS.value }
+
     init {
         pokusajPonovo()
+        scope.launch {
+            otvaranjeBaze.stanje.filterIsInstance<StanjeBaze.Spremna>().first()
+            repo().postavke.collect { zakljucavanjeS.value = it.zakljucavanjeS }
+        }
     }
 
     /** Pokreće (ponovo) otvaranje baze; poziva se pri startu i iz dugmeta „Pokušaj ponovo“. */

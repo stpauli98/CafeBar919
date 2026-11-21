@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import dev.nextpixel.cafebar919.data.StanjeBaze
 import dev.nextpixel.cafebar919.ui.greska.BazaGreskaEkran
-import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.AppNav
 import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.CafeBarTema
 import java.time.LocalDate
@@ -29,12 +29,17 @@ class MainActivity : ComponentActivity() {
             CafeBarTema {
                 val stanje by app.container.otvaranjeBaze.stanje.collectAsState()
                 when (stanje) {
-                    is StanjeBaze.Spremna -> PocetniEkran(danas = LocalDate.now(app.clock), onPodesavanja = {})
+                    is StanjeBaze.Spremna -> AppNav(app.container, LocalDate.now(app.clock))
                     is StanjeBaze.Greska -> BazaGreskaEkran(onPonovo = app.container::pokusajPonovo)
                     StanjeBaze.Ucitavanje -> Box(Modifier.fillMaxSize().background(Boje.bg))
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (application as CafeBarApp).container.sesija.zakljucaj()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
