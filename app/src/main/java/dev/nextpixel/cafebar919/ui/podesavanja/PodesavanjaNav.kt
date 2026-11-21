@@ -37,6 +37,9 @@ import androidx.navigation.compose.rememberNavController
 import dev.nextpixel.cafebar919.AppContainer
 import dev.nextpixel.cafebar919.repo.BrojaciMenija
 import dev.nextpixel.cafebar919.ui.podesavanja.pravila.PravilaEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.oaplikaciji.OAplikacijiEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.pin.PromjenaPinaEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.pin.PromjenaPinaViewModel
 import dev.nextpixel.cafebar919.ui.podesavanja.pravila.PravilaViewModel
 import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
 import kotlinx.coroutines.Dispatchers
@@ -123,6 +126,7 @@ private fun RadniDio(sekcija: Sekcija, container: AppContainer, toast: ToastStan
         Sekcija.MJERE -> MjereEkran(viewModel(factory = MjereViewModel.Fabrika(container)), toast)
         Sekcija.LJUDI -> LjudiEkran(viewModel(factory = LjudiViewModel.Fabrika(container)), toast)
         Sekcija.PRAVILA -> PravilaEkran(viewModel(factory = PravilaViewModel.Fabrika(container)), toast)
-        Sekcija.PIN, Sekcija.O_APLIKACIJI -> Unit
+        Sekcija.PIN -> PromjenaPinaEkran(viewModel(factory = PromjenaPinaViewModel.Fabrika(container)), toast)
+        Sekcija.O_APLIKACIJI -> OAplikacijiEkran(container.repo())
     }
 }

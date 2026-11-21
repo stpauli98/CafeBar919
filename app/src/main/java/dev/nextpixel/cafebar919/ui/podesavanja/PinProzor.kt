@@ -30,9 +30,9 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 private const val DUZINA_PIN = 6
-private const val PIN_01 = "PIN nije tačan. Unesi ponovo. · PIN-01"
+internal const val PIN_01 = "PIN nije tačan. Unesi ponovo. · PIN-01"
 
-private fun pin02(do_: Instant, clock: Clock): String {
+internal fun pin02(do_: Instant, clock: Clock): String {
     val vrijeme = DateTimeFormatter.ofPattern("HH:mm").withZone(clock.zone).format(do_)
     return "Previše pogrešnih pokušaja. Novi pokušaj je moguć u $vrijeme. · PIN-02"
 }
