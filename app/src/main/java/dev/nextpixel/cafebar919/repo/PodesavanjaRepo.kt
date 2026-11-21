@@ -43,10 +43,11 @@ class PodesavanjaRepo(private val db: AppDatabase, private val clock: Clock) {
 
     val artikli: Flow<List<ArtikalPrikaz>> =
         combine(aDao.svi(), kDao.sve(), mDao.sve(), aDao.sveMjere()) { art, kat, mj, veze ->
-            art.map { a ->
+            art.mapNotNull { a ->
+                val k = kat.firstOrNull { it.id == a.kategorijaId } ?: return@mapNotNull null
                 ArtikalPrikaz(
                     a = a,
-                    kategorija = kat.first { it.id == a.kategorijaId },
+                    kategorija = k,
                     mjere = veze.filter { it.artikalId == a.id }.sortedBy { it.redoslijed }
                         .mapNotNull { v -> mj.firstOrNull { it.id == v.mjeraId } },
                 )
@@ -214,8 +215,14 @@ class PodesavanjaRepo(private val db: AppDatabase, private val clock: Clock) {
     }
 
     /** Bez pravila u repozitoriju; potvrdu traži UI. */
-    suspend fun postaviAktivanRadnik(id: Long, aktivan: Boolean) = db.withTransaction {
-        rDao.izmijeni(rDao.jednom().first { it.id == id }.copy(aktivan = aktivan))
+    suspend fun postaviAktivanRadnik(id: Long, aktivan: Boolean): Ishod = db.withTransaction {
+        val svi = rDao.jednom()
+        val r = svi.first { it.id == id }
+        if (aktivan && svi.any { it.aktivan && it.id != id && kljuc(it.ime) == kljuc(r.ime) }) {
+            return@withTransaction odbij(Odbijanje.NAZIV_POSTOJI)
+        }
+        rDao.izmijeni(r.copy(aktivan = aktivan))
+        Ishod.Ok
     }
 
     // ---- pravila rada ----
@@ -251,7 +258,10 @@ class PodesavanjaRepo(private val db: AppDatabase, private val clock: Clock) {
         Ishod.Ok
     }
 
-    suspend fun ukloniRazlog(id: Long) = db.withTransaction {
-        zDao.jednom().firstOrNull { it.id == id }?.let { zDao.izmijeni(it.copy(aktivan = false)) }
+    suspend fun ukloniRazlog(id: Long) {
+        db.withTransaction {
+            val r = zDao.jednom().firstOrNull { it.id == id }
+            if (r != null) zDao.izmijeni(r.copy(aktivan = false))
+        }
     }
 }

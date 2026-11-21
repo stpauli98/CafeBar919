@@ -6,6 +6,7 @@ import dev.nextpixel.cafebar919.data.NocE
 import dev.nextpixel.cafebar919.data.NocPrimalacE
 import dev.nextpixel.cafebar919.data.StavkaTureE
 import dev.nextpixel.cafebar919.data.TuraE
+import dev.nextpixel.cafebar919.data.Uloga
 import dev.nextpixel.cafebar919.data.VrstaPrimaoca
 import dev.nextpixel.cafebar919.domain.Format
 import dev.nextpixel.cafebar919.domain.Ishod
@@ -77,6 +78,20 @@ class PodesavanjaRepoTest {
         repo.postaviAktivanArtikal(a, false)
         assertEquals(Ishod.Ok, repo.postaviAktivnaMjera(bokal, false))
         assertEquals(Ishod.Odbijeno(Odbijanje.MJERA_ISKLJUCENA), repo.postaviAktivanArtikal(a, true))
+    }
+    @Test fun ukljuciArtikal_odbijaKadJeKategorijaIskljucena() = runTest {
+        val k = kat("Vino"); val bokal = mjeraId("Bokal")
+        repo.sacuvajArtikal(null, "Crveno", k, listOf(bokal))
+        val a = artikalId("Crveno")
+        repo.postaviAktivanArtikal(a, false)
+        assertEquals(Ishod.Ok, repo.postaviAktivnaKategorija(k, false))
+        assertEquals(Ishod.Odbijeno(Odbijanje.KATEGORIJA_ISKLJUCENA), repo.postaviAktivanArtikal(a, true))
+    }
+    @Test fun ukljuciRadnika_odbijaDupliNaziv() = runTest {
+        val stari = repo.radnici.first().first { it.ime == "Vuleta" }.id
+        assertEquals(Ishod.Ok, repo.postaviAktivanRadnik(stari, false))
+        assertEquals(Ishod.Ok, repo.sacuvajRadnika(null, "Vuleta", Uloga.KONOBAR))
+        assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_POSTOJI), repo.postaviAktivanRadnik(stari, true))
     }
     @Test fun mjeraUUpotrebi_neMozeSeIskljuciti() = runTest {
         val k = kat("Vino"); val bokal = mjeraId("Bokal")
