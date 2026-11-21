@@ -31,12 +31,15 @@ class PinServis(private val db: AppDatabase, private val clock: Clock) {
 
     suspend fun provjeri(pin: String): ProvjeraPina = db.withTransaction { pokusaj(pin) }
 
-    suspend fun blokiranDo(): Instant? = db.withTransaction {
-        val p = dao.jedne()
+    suspend fun blokiranDo(): Instant? {
+        val zapisano = dao.jedne().pinBlokiranDo ?: return null
         val sada = clock.instant()
-        val do_ = ogranici(p.pinBlokiranDo ?: return@withTransaction null, sada)
-        if (do_.toEpochMilli() != p.pinBlokiranDo) dao.izmijeni(p.copy(pinBlokiranDo = do_.toEpochMilli()))
-        do_.takeIf { it.isAfter(sada) }
+        val do_ = ogranici(zapisano, sada)
+        // Samo kad je sat vraćen unazad treba pisati: skraćena blokada se čuva.
+        if (do_.toEpochMilli() != zapisano) {
+            db.withTransaction { dao.jedne().let { dao.izmijeni(it.copy(pinBlokiranDo = do_.toEpochMilli())) } }
+        }
+        return do_.takeIf { it.isAfter(sada) }
     }
 
     /** Sat vraćen unazad ne smije produžiti blokadu: najviše `Pin.BLOKADA` od sada. */
