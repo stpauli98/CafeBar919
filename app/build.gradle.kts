@@ -22,10 +22,10 @@ android {
 
     signingConfigs {
         create("release") {
-            val storeFile = providers.gradleProperty("CAFEBAR_STORE_FILE").orNull
-            val storePassword = providers.gradleProperty("CAFEBAR_STORE_PASSWORD").orNull
-            val keyAlias = providers.gradleProperty("CAFEBAR_KEY_ALIAS").orNull
-            val keyPassword = providers.gradleProperty("CAFEBAR_KEY_PASSWORD").orNull
+            val storeFile = providers.gradleProperty("CAFEBAR_STORE_FILE").orNull?.takeIf { it.isNotBlank() }
+            val storePassword = providers.gradleProperty("CAFEBAR_STORE_PASSWORD").orNull?.takeIf { it.isNotBlank() }
+            val keyAlias = providers.gradleProperty("CAFEBAR_KEY_ALIAS").orNull?.takeIf { it.isNotBlank() }
+            val keyPassword = providers.gradleProperty("CAFEBAR_KEY_PASSWORD").orNull?.takeIf { it.isNotBlank() }
             if (storeFile != null && storePassword != null && keyAlias != null && keyPassword != null) {
                 this.storeFile = file(storeFile)
                 this.storePassword = storePassword

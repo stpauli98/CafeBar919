@@ -13,6 +13,12 @@ Android dozvoljava instalaciju preko postojeće aplikacije samo ako je potpisana
 - Gradle čita putanju i lozinke iz `~/.gradle/gradle.properties`: `CAFEBAR_STORE_FILE`, `CAFEBAR_STORE_PASSWORD`, `CAFEBAR_KEY_ALIAS`, `CAFEBAR_KEY_PASSWORD`.
 - Ništa od toga ne ide u git. Lozinka se nikad ne upisuje u kod ni u dokumentaciju.
 
+Lozinku vrati iz Keychain-a ovom naredbom (ispisuje lozinku, pa je ne lijepi nigdje):
+
+```
+security find-generic-password -s cafebar919-release -a nextpixel -w
+```
+
 Napravi rezervnu kopiju fajla ključa i lozinke na sigurno mjesto van računara (npr. šifrovani USB ili menadžer lozinki).
 
 ## Šta ako se ključ izgubi
@@ -29,6 +35,8 @@ Nova verzija se više ne može instalirati preko stare. Jedini izlaz je napravit
 ```
 
 3. Rezultat je `app/build/outputs/apk/release/app-release.apk`. Ako u `~/.gradle/gradle.properties` nema svojstava za ključ, release build ne uspijeva; debug build i testovi rade i bez njih.
+
+Ako na računaru nema ključa (nedostaju svojstva `CAFEBAR_*`), `assembleRelease` ne uspijeva sa porukom `Keystore file not set for signing config release`. Debug build i testovi rade i bez ključa.
 
 Provjera potpisa:
 
