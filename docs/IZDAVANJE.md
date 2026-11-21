@@ -34,9 +34,9 @@ Nova verzija se više ne može instalirati preko stare. Jedini izlaz je napravit
 ./gradlew assembleRelease
 ```
 
-3. Rezultat je `app/build/outputs/apk/release/app-release.apk`. Ako u `~/.gradle/gradle.properties` nema svojstava za ključ, release build ne uspijeva; debug build i testovi rade i bez njih.
+3. Rezultat je `app/build/outputs/apk/release/app-release.apk`.
 
-Ako na računaru nema ključa (nedostaju svojstva `CAFEBAR_*`), `assembleRelease` ne uspijeva sa porukom `Keystore file not set for signing config release`. Debug build i testovi rade i bez ključa.
+Ako na računaru nema ključa (u `~/.gradle/gradle.properties` nedostaju svojstva `CAFEBAR_*`), `assembleRelease` ne uspijeva sa porukom `Keystore file not set for signing config release`. Debug build i testovi rade i bez ključa.
 
 Provjera potpisa:
 
@@ -45,6 +45,10 @@ $ANDROID_HOME/build-tools/<verzija>/apksigner verify --print-certs app/build/out
 ```
 
 Sertifikat mora biti `CN=Caffe Bar 919`, a SHA-256 mora počinjati sa `37:67:7C:FB`. Ako nije, APK nije potpisan pravim ključem i ne smije se instalirati.
+
+## Promjena šeme baze
+
+Svaka promjena šeme baze znači: nova verzija baze (`version` u `AppDatabase`), migracija sa prethodne verzije, test migracije i nov JSON šeme u `app/schemas/` koji ide u git. Migracija nikad ne briše podatke, a `fallbackToDestructiveMigration` se ne koristi (spec 9.3).
 
 ## Instalacija na tablet
 
