@@ -7,7 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import dev.nextpixel.cafebar919.data.StanjeBaze
+import dev.nextpixel.cafebar919.ui.greska.BazaGreskaEkran
 import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
+import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.CafeBarTema
 import java.time.LocalDate
 
@@ -18,7 +27,12 @@ class MainActivity : ComponentActivity() {
         val app = application as CafeBarApp
         setContent {
             CafeBarTema {
-                PocetniEkran(danas = LocalDate.now(app.clock), onPodesavanja = {})
+                val stanje by app.container.otvaranjeBaze.stanje.collectAsState()
+                when (stanje) {
+                    is StanjeBaze.Spremna -> PocetniEkran(danas = LocalDate.now(app.clock), onPodesavanja = {})
+                    is StanjeBaze.Greska -> BazaGreskaEkran(onPonovo = app.container::pokusajPonovo)
+                    StanjeBaze.Ucitavanje -> Box(Modifier.fillMaxSize().background(Boje.bg))
+                }
             }
         }
     }

@@ -4,5 +4,6 @@ import android.app.Application
 import java.time.Clock
 
 class CafeBarApp : Application() {
-    val clock: Clock = Clock.systemDefaultZone()
+    val container: AppContainer by lazy { AppContainer(this) }
+    val clock: Clock get() = container.clock
 }
