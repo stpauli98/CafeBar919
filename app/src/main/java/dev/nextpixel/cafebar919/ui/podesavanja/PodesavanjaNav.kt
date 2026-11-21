@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.nextpixel.cafebar919.ui.components.ToastHost
+import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.components.ToastStanje
 import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliViewModel
@@ -99,6 +101,11 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
         }
         composable(RUTA_PODESAVANJA) { unos ->
             val sekcija = unos.arguments?.getString("sekcija")?.let { n -> Sekcija.entries.firstOrNull { it.name == n } } ?: Sekcija.ARTIKLI
+            // Dok je zaključano (npr. poslije onStop ili smrti procesa) crta se samo pozadina; efekat gore vraća na početni ekran.
+            if (!otkljucano) {
+                Box(Modifier.fillMaxSize().background(Boje.bg))
+                return@composable
+            }
             BackHandler { sesija.zakljucaj() }
             // Jedan toast za cijelo područje podešavanja, iznad radnog dijela.
             val toast = remember { ToastStanje() }

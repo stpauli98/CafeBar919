@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import dev.nextpixel.cafebar919.CafeBarApp
 import dev.nextpixel.cafebar919.MainActivity
 import org.junit.Assert.assertTrue
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
