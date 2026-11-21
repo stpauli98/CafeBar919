@@ -186,6 +186,7 @@ class ArtikliTest {
         unesiNaziv("smirnoff")
         assertFalse(postoji("Taj naziv već postoji · ARTIKAL-01")) // dok se kuca, nema greške
         compose.onNode(hasSetTextAction()).performKeyInput { pressKey(Key.Tab) } // fokus napušta polje
+        compose.waitForIdle()
         cekaj("Taj naziv već postoji · ARTIKAL-01")
     }
 
@@ -286,9 +287,11 @@ class ArtikliTest {
         cekajUslov { vm.lista.value?.map { it.a.naziv } == listOf("A", "C", "E") }
         vm.pomjeri(0, 2) // A prelazi na kraj prikazane liste
         cekajUslov { redoslijedNaziva() == listOf("C", "B", "E", "D", "A") }
+        // Čeka se i ViewModel (ne samo baza): pomjeri(4, 0) čita lista.value.
+        cekajUslov { vm.lista.value?.map { it.a.naziv } == listOf("C", "E", "A") }
         // Bez filtera pomjeranje važi za cijelu listu.
         vm.postaviFilter(null)
-        cekajUslov { vm.lista.value?.size == 5 }
+        cekajUslov { vm.lista.value?.map { it.a.naziv } == listOf("C", "B", "E", "D", "A") }
         vm.pomjeri(4, 0)
         cekajUslov { redoslijedNaziva() == listOf("A", "C", "B", "E", "D") }
     }

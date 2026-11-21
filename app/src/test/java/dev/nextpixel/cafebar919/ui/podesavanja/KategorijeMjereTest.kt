@@ -192,8 +192,10 @@ class KategorijeMjereTest {
         cekaj("Sačuvaj kategoriju")
         polje(0).performClick()
         polje(0).performTextInput("pivo")
+        compose.waitForIdle()
         assertFalse(postoji("Ta kategorija već postoji.")) // dok se kuca, nema greške
         polje(0).performKeyInput { pressKey(Key.Tab) }
+        compose.waitForIdle()
         cekaj("Ta kategorija već postoji.")
     }
 
@@ -338,8 +340,9 @@ class KategorijeMjereTest {
         cekaj("Sačuvaj mjeru")
         polje(0).performClick()
         polje(0).performTextInput("Bokal")
-        assertFalse(postoji("Ta mjera već postoji."))
-        polje(0).performKeyInput { pressKey(Key.Tab) }
+        compose.waitForIdle()
+        assertFalse(postoji("Ta mjera već postoji.")) // dok se kuca, nema greške
+        polje(1).performClick() // fokus se eksplicitno prebacuje u drugo polje
         cekaj("Ta mjera već postoji.")
     }
 

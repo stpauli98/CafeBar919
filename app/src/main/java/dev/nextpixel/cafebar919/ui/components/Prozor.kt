@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import dev.nextpixel.cafebar919.ui.theme.Boje
@@ -60,7 +63,16 @@ fun Prozor(
     Dialog(onDismissRequest = onZatvori, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         // Scrim crtamo sami (Paper: #000000A8), pa prozorska zatamnjenost sistema ide na nulu.
         val prozor = (LocalView.current.parent as? DialogWindowProvider)?.window
-        SideEffect { prozor?.setDimAmount(0f) }
+        val pogled = LocalView.current
+        SideEffect {
+            prozor?.setDimAmount(0f)
+            // Aplikacija je imerzivna: ni prozor ne smije vratiti sistemske trake.
+            prozor?.let {
+                val kontroler = WindowCompat.getInsetsController(it, pogled)
+                kontroler.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                kontroler.hide(WindowInsetsCompat.Type.systemBars())
+            }
+        }
         Box(
             Modifier
                 .fillMaxSize()
