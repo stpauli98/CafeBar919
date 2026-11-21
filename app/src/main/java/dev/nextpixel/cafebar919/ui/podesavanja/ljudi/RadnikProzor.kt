@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.nextpixel.cafebar919.data.Uloga
@@ -71,7 +72,7 @@ fun RadnikProzor(forma: RadnikForma, vm: LjudiViewModel) {
                     },
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Uloga", color = Boje.ink, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold))
+                    Text("Uloga", color = Boje.ink, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold))
                     SegmentiraniIzbor(ULOGE.map { it.second }, ULOGE.indexOfFirst { it.first == forma.uloga }) { vm.promijeniUlogu(ULOGE[it].first) }
                 }
             }

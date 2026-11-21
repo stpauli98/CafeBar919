@@ -139,6 +139,23 @@ class LjudiPravilaTest {
         cekajUslov { repoPoziv { repo.radnici.first().single { it.ime == "Vuleta" }.aktivan } }
     }
 
+    @Test fun ljudi_ponovnoUkljucivanjeSaZauzetimImenom() {
+        prikaziLjude()
+        cekaj("Vuleta")
+        compose.onNodeWithContentDescription("Vuleta").performClick()
+        cekaj("Isključiti Vuleta?")
+        compose.onNodeWithText("Isključi").performClick()
+        cekajUslov { !repoPoziv { repo.radnici.first().single { it.ime == "Vuleta" }.aktivan } }
+        // Novi aktivni „Vuleta“ je dozvoljen dok je stari isključen.
+        repoPoziv { assertEquals(Ishod.Ok, repo.sacuvajRadnika(null, "Vuleta", Uloga.KONOBAR)) }
+        cekajUslov { lvm.lista.value?.count { it.ime == "Vuleta" } == 2 }
+        cekajUslov { compose.onAllNodesWithContentDescription("Vuleta").fetchSemanticsNodes().size == 2 }
+        // Stari je prvi u listi: njegovo uključivanje je odbijeno i javlja se toast.
+        compose.onAllNodesWithContentDescription("Vuleta")[0].performClick()
+        cekaj("Radnik sa tim imenom već postoji.")
+        assertEquals(1, repoPoziv { repo.radnici.first().count { it.ime == "Vuleta" && !it.aktivan } })
+    }
+
     @Test fun ljudi_noviIDuplikat() {
         prikaziLjude()
         cekaj("Novi radnik")
@@ -188,6 +205,16 @@ class LjudiPravilaTest {
         minus(1).performClick() // istorija: nema noći pa ide bez pitanja
         cekaj("29 dana")
         assertEquals(29, repoPoziv { repo.postavke.first().istorijaDana })
+    }
+
+    @Test fun pravila_dvaBrzaDodiraDajuDvaKoraka() {
+        prikaziPravila()
+        cekaj("60 s")
+        // Dva dodira prije nego što tok ponovo javi vrijednost: svaki se računa od najnovije.
+        pvm.rokBezPina(1)
+        pvm.rokBezPina(1)
+        cekaj("80 s")
+        cekajUslov { repoPoziv { repo.postavke.first().rokBezPinaS } == 80 }
     }
 
     @Test fun pravila_stepperGranice() {

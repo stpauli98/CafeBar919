@@ -3,7 +3,6 @@ package dev.nextpixel.cafebar919.ui.podesavanja.ljudi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.nextpixel.cafebar919.data.RadnikE
 import dev.nextpixel.cafebar919.ui.components.GlavnoDugme
-import dev.nextpixel.cafebar919.ui.components.OpasnoDugme
 import dev.nextpixel.cafebar919.ui.components.Prekidac
 import dev.nextpixel.cafebar919.ui.components.Prozor
 import dev.nextpixel.cafebar919.ui.components.SegmentiraniIzbor
@@ -123,9 +121,7 @@ private fun RedRadnika(r: RadnikE, onUloga: (Int) -> Unit, onAktivan: (Boolean) 
             Text(r.ime, color = if (r.aktivan) Boje.ink else Boje.muted, maxLines = 1, style = Tekst.body.copy(fontSize = 18.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold))
             Text(opisUloge(r.uloga), color = Boje.muted, maxLines = 1, style = Tekst.body.copy(fontSize = 13.sp, lineHeight = 16.sp))
         }
-        Box(Modifier.width(260.dp)) {
-            SegmentiraniIzbor(ULOGE.map { it.second }, ULOGE.indexOfFirst { it.first == r.uloga }, onUloga)
-        }
+        SegmentiraniIzbor(ULOGE.map { it.second }, ULOGE.indexOfFirst { it.first == r.uloga }, onUloga)
         Text("radi", Modifier.width(80.dp), color = Boje.muted, textAlign = TextAlign.End, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 18.sp))
         Prekidac(r.aktivan, onAktivan, opis = r.ime)
     }

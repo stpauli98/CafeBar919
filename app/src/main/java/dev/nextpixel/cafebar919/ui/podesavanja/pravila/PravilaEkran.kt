@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.nextpixel.cafebar919.data.PostavkeE
+import dev.nextpixel.cafebar919.data.RazlogE
 import dev.nextpixel.cafebar919.domain.Format
 import dev.nextpixel.cafebar919.domain.Validacija
 import dev.nextpixel.cafebar919.ui.components.Cip
@@ -98,7 +99,7 @@ fun PravilaEkran(vm: PravilaViewModel, toast: ToastStanje) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Redovi(p: PostavkeE, vm: PravilaViewModel, razlozi: List<dev.nextpixel.cafebar919.data.RazlogE>?) {
+private fun Redovi(p: PostavkeE, vm: PravilaViewModel, razlozi: List<RazlogE>?) {
     Column(Modifier.fillMaxWidth()) {
         Red("Poništavanje bez PIN-a", "Koliko dugo poslije potvrde radnik može sam poništiti turu.") {
             Stepper(
