@@ -19,4 +19,13 @@ interface ArtikalDao {
     @Insert suspend fun dodaj(a: ArtikalE): Long
     @Update suspend fun izmijeni(a: ArtikalE)
     @Insert suspend fun dodajMjere(m: List<ArtikalMjeraE>)
+
+    @Query("SELECT * FROM artikal ORDER BY redoslijed, id")
+    suspend fun jednom(): List<ArtikalE>
+
+    @Query("SELECT * FROM artikal_mjera ORDER BY artikal_id, redoslijed")
+    suspend fun sveMjereJednom(): List<ArtikalMjeraE>
+
+    @Query("DELETE FROM artikal_mjera WHERE artikal_id = :artikalId")
+    suspend fun obrisiMjere(artikalId: Long)
 }

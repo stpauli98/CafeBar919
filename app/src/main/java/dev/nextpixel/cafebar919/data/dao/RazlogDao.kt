@@ -14,4 +14,7 @@ interface RazlogDao {
 
     @Insert suspend fun dodaj(r: RazlogE): Long
     @Update suspend fun izmijeni(r: RazlogE)
+
+    @Query("SELECT * FROM razlog_ponistavanja ORDER BY redoslijed, id")
+    suspend fun jednom(): List<RazlogE>
 }

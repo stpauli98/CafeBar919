@@ -14,4 +14,7 @@ interface KategorijaDao {
 
     @Insert suspend fun dodaj(k: KategorijaE): Long
     @Update suspend fun izmijeni(k: KategorijaE)
+
+    @Query("SELECT * FROM kategorija ORDER BY redoslijed, id")
+    suspend fun jednom(): List<KategorijaE>
 }

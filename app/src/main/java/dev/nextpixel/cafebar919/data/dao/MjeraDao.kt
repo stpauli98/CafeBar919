@@ -14,4 +14,7 @@ interface MjeraDao {
 
     @Insert suspend fun dodaj(m: MjeraE): Long
     @Update suspend fun izmijeni(m: MjeraE)
+
+    @Query("SELECT * FROM mjera ORDER BY redoslijed, id")
+    suspend fun jednom(): List<MjeraE>
 }

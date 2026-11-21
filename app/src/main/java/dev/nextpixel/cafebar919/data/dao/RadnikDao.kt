@@ -14,4 +14,7 @@ interface RadnikDao {
 
     @Insert suspend fun dodaj(r: RadnikE): Long
     @Update suspend fun izmijeni(r: RadnikE)
+
+    @Query("SELECT * FROM radnik ORDER BY redoslijed, id")
+    suspend fun jednom(): List<RadnikE>
 }
