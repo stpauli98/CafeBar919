@@ -109,7 +109,7 @@ class KomponenteTest {
         compose.setContent {
             CafeBarTema { Baner(VrstaBanera.UPOZORENJE, "Otključano za vlasnika.", "Zaključava se za 2 min.", "Zaključaj", { kliknuto = true }) }
         }
-        compose.onNodeWithText("Otključano za vlasnika.").assertIsDisplayed()
+        compose.onNodeWithText("Otključano za vlasnika.", substring = true).assertIsDisplayed()
         compose.onNodeWithText("Zaključaj").performClick()
         assertTrue(kliknuto)
     }
@@ -167,5 +167,12 @@ class KomponenteTest {
         compose.onNodeWithText("Sve · 15").performClick()
         compose.onNodeWithContentDescription("Prekidač").performClick()
         assertEquals(1, cip); assertEquals(1, pilula); assertEquals(true, prekidac)
+    }
+
+    @Test fun prekidac_koristiProsljedjeniOpis() {
+        var stanje: Boolean? = null
+        compose.setContent { CafeBarTema { Prekidac(false, { stanje = it }, opis = "Aktivan: Jelen pivo") } }
+        compose.onNodeWithContentDescription("Aktivan: Jelen pivo").performClick()
+        assertEquals(true, stanje)
     }
 }

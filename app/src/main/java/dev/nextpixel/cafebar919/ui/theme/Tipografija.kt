@@ -16,7 +16,7 @@ private fun varijabilni(resurs: Int, vararg tezine: FontWeight) = FontFamily(
 /** Inter za cijeli UI (variable font, Latin Extended pokriva č, ć, š, ž, đ). */
 val InterFamilija = varijabilni(
     R.font.inter,
-    FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold,
+    FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold, FontWeight.ExtraBold,
 )
 
 /** Cinzel samo za znak „919 CAFFE BAR“. */

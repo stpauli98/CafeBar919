@@ -2,31 +2,49 @@ package dev.nextpixel.cafebar919.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import dev.nextpixel.cafebar919.ui.theme.Boje
-import dev.nextpixel.cafebar919.ui.theme.Oblici
-import dev.nextpixel.cafebar919.ui.theme.Razmaci
 import dev.nextpixel.cafebar919.ui.theme.Tekst
 
-/** Prozor sa scrimom: surface, radius 16. Dugmad se poravnavaju desno. */
+/** Radius 20 iz Papera (prozori); Paper ima prednost nad radijusom 16 iz plana. */
+private val OblikProzora = RoundedCornerShape(20.dp)
+
+/**
+ * Prozor sa scrimom (Paper O3/V0): scrim crni 66 %, surface, radius 20, padding 28, razmak 14,
+ * naslov 22/800, sjena 0 24 64 crna 50 %, red dugmadi desno sa razmakom 12 i 8 dp razmaka iznad.
+ */
 @Composable
 fun Prozor(
     naslov: String,
@@ -37,20 +55,37 @@ fun Prozor(
     dugmad: @Composable RowScope.() -> Unit,
 ) {
     Dialog(onDismissRequest = onZatvori, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Column(
+        // Scrim crtamo sami (Paper: #000000A8), pa prozorska zatamnjenost sistema ide na nulu.
+        val prozor = (LocalView.current.parent as? DialogWindowProvider)?.window
+        SideEffect { prozor?.setDimAmount(0f) }
+        Box(
             Modifier
-                .width(sirina)
-                .background(Boje.surface, Oblici.lg)
-                .border(1.dp, Boje.line, Oblici.lg)
-                .padding(Razmaci.s6),
-            verticalArrangement = Arrangement.spacedBy(Razmaci.s4),
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.66f))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onZatvori),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Razmaci.s3)) {
-                if (ikona != null) Icon(ikona, null, Modifier.size(28.dp), tint = Boje.primary)
-                Text(naslov, style = Tekst.section, color = Boje.ink)
+            Column(
+                Modifier
+                    .width(sirina)
+                    .shadow(32.dp, OblikProzora, ambientColor = Color.Black.copy(alpha = 0.5f), spotColor = Color.Black.copy(alpha = 0.5f))
+                    .background(Boje.surface, OblikProzora)
+                    .border(1.dp, Boje.line, OblikProzora)
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {})
+                    .padding(28.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (ikona != null) Icon(ikona, null, Modifier.size(24.dp), tint = Boje.primary)
+                    Text(
+                        naslov,
+                        style = Tekst.body.copy(fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.01).em),
+                        color = Boje.ink,
+                    )
+                }
+                sadrzaj()
+                Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)) { dugmad() }
             }
-            sadrzaj()
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Razmaci.s3, Alignment.End)) { dugmad() }
         }
     }
 }
