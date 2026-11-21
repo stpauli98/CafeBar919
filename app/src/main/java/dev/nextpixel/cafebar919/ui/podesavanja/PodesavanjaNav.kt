@@ -21,6 +21,10 @@ import dev.nextpixel.cafebar919.ui.components.ToastHost
 import dev.nextpixel.cafebar919.ui.components.ToastStanje
 import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.artikli.ArtikliViewModel
+import dev.nextpixel.cafebar919.ui.podesavanja.kategorije.KategorijeEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.kategorije.KategorijeViewModel
+import dev.nextpixel.cafebar919.ui.podesavanja.mjere.MjereEkran
+import dev.nextpixel.cafebar919.ui.podesavanja.mjere.MjereViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
@@ -111,7 +115,9 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
 private fun RadniDio(sekcija: Sekcija, container: AppContainer, toast: ToastStanje) {
     when (sekcija) {
         Sekcija.ARTIKLI -> ArtikliEkran(viewModel(factory = ArtikliViewModel.Fabrika(container)), toast)
-        Sekcija.KATEGORIJE, Sekcija.MJERE, Sekcija.LJUDI,
+        Sekcija.KATEGORIJE -> KategorijeEkran(viewModel(factory = KategorijeViewModel.Fabrika(container)), toast)
+        Sekcija.MJERE -> MjereEkran(viewModel(factory = MjereViewModel.Fabrika(container)), toast)
+        Sekcija.LJUDI,
         Sekcija.PRAVILA, Sekcija.PIN, Sekcija.O_APLIKACIJI -> Unit
     }
 }
