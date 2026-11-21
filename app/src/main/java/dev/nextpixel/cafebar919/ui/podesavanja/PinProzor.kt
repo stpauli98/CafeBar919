@@ -68,8 +68,9 @@ fun PinProzor(
         cifre += c
         if (cifre.length < DUZINA_PIN) return
         provjera = true
+        val uneseno = cifre // uhvaćeno prije korutine: brisanje u istom kadru ne smije promijeniti provjeru
         scope.launch {
-            when (val r = pin.provjeri(cifre)) {
+            when (val r = pin.provjeri(uneseno)) {
                 ProvjeraPina.Tacan -> {
                     onOtkljucano()
                     return@launch // tastatura ostaje onemogućena dok se prozor zatvara

@@ -1,6 +1,11 @@
 package dev.nextpixel.cafebar919.ui.podesavanja
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -135,5 +140,36 @@ class PinProzorTest {
         }
         compose.onNodeWithText("PIN vlasnika").performClick()
         assertEquals(Sekcija.PIN.ordinal, izabrana.intValue)
+    }
+
+    @Test fun pinProzor_blokiranPriOtvaranjuPrikazujePin02() {
+        kotlinx.coroutines.runBlocking { repeat(10) { pin.provjeri("000001") } }
+        compose.setContent { CafeBarTema { PinProzor(pin, {}, {}, sat) } }
+        compose.waitUntil(5_000) { postoji("PIN-02") }
+        compose.onNodeWithText("Previše pogrešnih pokušaja. Novi pokušaj je moguć u 23:58. · PIN-02").assertExists()
+        compose.onNodeWithText("1").assertIsNotEnabled()
+    }
+
+    @Test fun ljuska_dodirURadnomDijeluVracaBrojac() {
+        var rok = 120
+        val sesija = PodesavanjaSesija(scope, { rok }); sesija.otkljucaj()
+        rok = 77
+        compose.setContent {
+            CafeBarTema {
+                Ljuska(Sekcija.ARTIKLI, {}, {}, sesija, BrojaciMenija(1, 1, 1, 1), probniPin = false) {
+                    Box(Modifier.fillMaxSize().testTag("radni"))
+                }
+            }
+        }
+        compose.onNodeWithTag("radni").performClick()
+        assertEquals(77, sesija.preostaloS.value)
+    }
+
+    @Test fun ljuska_artikliBezPicaKazeNemaPica() {
+        val sesija = PodesavanjaSesija(scope, { 120 }); sesija.otkljucaj()
+        compose.setContent {
+            CafeBarTema { Ljuska(Sekcija.ARTIKLI, {}, {}, sesija, BrojaciMenija(0, 0, 0, 0), probniPin = false) {} }
+        }
+        compose.onNodeWithText("nema pića · redoslijed").assertExists()
     }
 }

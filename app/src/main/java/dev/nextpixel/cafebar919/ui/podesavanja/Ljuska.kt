@@ -81,7 +81,7 @@ private val Sekcija.ikona: ImageVector
     }
 
 private fun Sekcija.podnaslov(b: BrojaciMenija): String = when (this) {
-    Sekcija.ARTIKLI -> "${Format.brojac(b.pica, "piće", "pića", "pića")} · redoslijed"
+    Sekcija.ARTIKLI -> "${if (b.pica == 0) "nema pića" else Format.brojac(b.pica, "piće", "pića", "pića")} · redoslijed"
     Sekcija.KATEGORIJE -> Format.brojac(b.kategorija, "kategorija", "kategorije", "kategorija")
     Sekcija.MJERE -> "${Format.brojac(b.mjera, "mjera", "mjere", "mjera")} u litrima"
     Sekcija.LJUDI -> Format.brojac(b.stalnihRadnika, "stalni radnik", "stalna radnika", "stalnih radnika")
@@ -150,7 +150,7 @@ private fun GornjaTraka(onNazad: () -> Unit) {
     ) {
         Row(
             Modifier
-                .heightIn(min = 48.dp)
+                .heightIn(min = Razmaci.dodir)
                 .clip(Oblici.md)
                 .border(BorderStroke(1.5.dp, Boje.neutralLine), Oblici.md)
                 .clickable(role = Role.Button, onClick = onNazad)

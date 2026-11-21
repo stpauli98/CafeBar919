@@ -1,11 +1,14 @@
 package dev.nextpixel.cafebar919.ui.podesavanja
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
@@ -16,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import dev.nextpixel.cafebar919.AppContainer
 import dev.nextpixel.cafebar919.repo.BrojaciMenija
 import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 private const val RUTA_POCETNI = "pocetni"
@@ -36,17 +41,33 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
         if (!otkljucano && naPodesavanjima) navController.popBackStack(RUTA_POCETNI, inclusive = false)
     }
 
-    NavHost(navController, startDestination = RUTA_POCETNI) {
+    // Brojači i probni PIN žive iznad NavHosta da prežive promjenu rute (nema treptanja nula i banera).
+    val brojaci by container.repo().brojaciMenija.collectAsState(BrojaciMenija(0, 0, 0, 0))
+    val probni by container.pin().probni.collectAsState(false)
+
+    // Bez prelaza: promjena sekcije ne smije utamniti cijelu ljusku.
+    NavHost(
+        navController,
+        startDestination = RUTA_POCETNI,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+    ) {
         composable(RUTA_POCETNI) {
             var pinOtvoren by rememberSaveable { mutableStateOf(false) }
+            val glavna = rememberCoroutineScope()
             PocetniEkran(danas = danas, onPodesavanja = { pinOtvoren = true })
             if (pinOtvoren) {
                 PinProzor(
                     pin = container.pin(),
                     onOtkljucano = {
-                        pinOtvoren = false
-                        sesija.otkljucaj()
-                        navController.navigate(rutaSekcije(Sekcija.ARTIKLI))
+                        // Ishod provjere stiže iz korutine; navigacija traži glavnu nit.
+                        glavna.launch(Dispatchers.Main.immediate) {
+                            pinOtvoren = false
+                            sesija.otkljucaj()
+                            navController.navigate(rutaSekcije(Sekcija.ARTIKLI))
+                        }
                     },
                     onOdustani = { pinOtvoren = false },
                     clock = container.clock,
@@ -55,8 +76,6 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
         }
         composable(RUTA_PODESAVANJA) { unos ->
             val sekcija = unos.arguments?.getString("sekcija")?.let { n -> Sekcija.entries.firstOrNull { it.name == n } } ?: Sekcija.ARTIKLI
-            val brojaci by container.repo().brojaciMenija.collectAsState(BrojaciMenija(0, 0, 0, 0))
-            val probni by container.pin().probni.collectAsState(false)
             BackHandler { sesija.zakljucaj() }
             Ljuska(
                 aktivna = sekcija,
