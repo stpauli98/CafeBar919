@@ -21,6 +21,7 @@ import dev.nextpixel.cafebar919.ui.theme.Razmaci
 @Composable
 fun Prekidac(ukljucen: Boolean, onPromjena: (Boolean) -> Unit, omogucen: Boolean = true, opis: String? = null) {
     val traka = when {
+        !omogucen && ukljucen -> Boje.infoLine // uključeno, ali zaključano: prigušeno zlato
         !omogucen -> Boje.disabledBg
         ukljucen -> Boje.primary
         else -> Boje.neutralLine
@@ -39,7 +40,7 @@ fun Prekidac(ukljucen: Boolean, onPromjena: (Boolean) -> Unit, omogucen: Boolean
                     .padding(4.dp)
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(if (!omogucen) Boje.disabledInk else if (ukljucen) Boje.onPrimary else Boje.ink),
+                    .background(if (!omogucen) (if (ukljucen) Boje.muted else Boje.disabledInk) else if (ukljucen) Boje.onPrimary else Boje.ink),
             )
         }
     }

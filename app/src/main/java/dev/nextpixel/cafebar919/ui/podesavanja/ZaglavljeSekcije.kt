@@ -38,12 +38,12 @@ internal fun ZaglavljeSekcije(naslov: String, podnaslov: String, dugme: String, 
     }
 }
 
-/** „›“ na kraju reda: otvara izmjenu. Dodirna zona 40×56. */
+/** „›“ na kraju reda: otvara izmjenu. Dodirna zona 56×56 (glif ostaje 24 dp). */
 @Composable
 internal fun DugmeIzmjene(naziv: String, onClick: () -> Unit) {
     Box(
         Modifier
-            .size(40.dp, Razmaci.dodir)
+            .size(Razmaci.dodir, Razmaci.dodir)
             .semantics { contentDescription = "Izmijeni $naziv" }
             .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,

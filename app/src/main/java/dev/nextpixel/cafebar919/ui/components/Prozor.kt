@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,7 +57,7 @@ fun Prozor(
     sadrzaj: @Composable ColumnScope.() -> Unit,
     dugmad: @Composable RowScope.() -> Unit,
 ) {
-    Dialog(onDismissRequest = onZatvori, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = onZatvori, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         // Scrim crtamo sami (Paper: #000000A8), pa prozorska zatamnjenost sistema ide na nulu.
         val prozor = (LocalView.current.parent as? DialogWindowProvider)?.window
         SideEffect { prozor?.setDimAmount(0f) }
@@ -62,7 +65,10 @@ fun Prozor(
             Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.66f))
-                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onZatvori),
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onZatvori)
+                // Tastatura podiže prozor; sadržaj se klizi, a dugmad ostaju vidljiva.
+                .imePadding()
+                .padding(vertical = 16.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -83,7 +89,7 @@ fun Prozor(
                         color = Boje.ink,
                     )
                 }
-                sadrzaj()
+                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) { sadrzaj() }
                 Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)) { dugmad() }
             }
         }
