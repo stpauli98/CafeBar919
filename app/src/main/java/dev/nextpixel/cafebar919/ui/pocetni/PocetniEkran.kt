@@ -28,18 +28,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.nextpixel.cafebar919.domain.Format
 import dev.nextpixel.cafebar919.ui.components.Znak919
 import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.Oblici
 import dev.nextpixel.cafebar919.ui.theme.Razmaci
 import dev.nextpixel.cafebar919.ui.theme.Tekst
 import java.time.LocalDate
-
-private val DANI = listOf("Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja")
-
-// Privremeno: Task 2 prebacuje formatiranje datuma u domain/Format.
-private fun datumUTraci(datum: LocalDate): String =
-    "${DANI[datum.dayOfWeek.value - 1]} ${datum.dayOfMonth}. ${datum.monthValue}."
 
 /** Privremeni početni ekran faze 1: gornja traka kao na S0 i poruka u sredini. */
 @Composable
@@ -56,7 +51,7 @@ fun PocetniEkran(danas: LocalDate, onPodesavanja: () -> Unit) {
         ) {
             Znak919()
             Box(Modifier.width(1.dp).height(32.dp).background(Boje.line))
-            Text(datumUTraci(danas), color = Boje.ink, style = Tekst.section)
+            Text(Format.datumNoci(danas), color = Boje.ink, style = Tekst.section)
             Spacer(Modifier.weight(1f))
             Row(
                 modifier = Modifier
