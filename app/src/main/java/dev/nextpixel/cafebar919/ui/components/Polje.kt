@@ -51,6 +51,7 @@ fun Polje(
     modifier: Modifier = Modifier,
 ) {
     val izvor = remember { MutableInteractionSource() }
+    val dodir = LocalDodir.current
     val fokus by izvor.collectIsFocusedAsState()
     val okvir = when {
         greska != null -> Boje.danger
@@ -66,7 +67,10 @@ fun Polje(
         )
         BasicTextField(
             value = vrijednost,
-            onValueChange = { if (max == null || it.length <= max) onPromjena(it) },
+            onValueChange = {
+                dodir()
+                if (max == null || it.length <= max) onPromjena(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             textStyle = stilTeksta.copy(color = Boje.ink),

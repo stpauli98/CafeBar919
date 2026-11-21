@@ -29,7 +29,9 @@ import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,8 +41,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,7 +50,9 @@ import androidx.compose.ui.unit.sp
 import dev.nextpixel.cafebar919.domain.Format
 import dev.nextpixel.cafebar919.repo.BrojaciMenija
 import dev.nextpixel.cafebar919.ui.components.Baner
+import dev.nextpixel.cafebar919.ui.components.LocalDodir
 import dev.nextpixel.cafebar919.ui.components.VrstaBanera
+import dev.nextpixel.cafebar919.ui.components.hvataDodir
 import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.Oblici
 import dev.nextpixel.cafebar919.ui.theme.Razmaci
@@ -105,34 +107,30 @@ fun Ljuska(
     sadrzaj: @Composable () -> Unit,
 ) {
     val preostaloS by sesija.preostaloS.collectAsState()
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Boje.bg)
-            .pointerInput(sesija) {
-                awaitPointerEventScope {
-                    while (true) {
-                        awaitPointerEvent(PointerEventPass.Initial)
-                        sesija.dodir()
-                    }
+    val dodir = remember(sesija) { sesija::dodir }
+    CompositionLocalProvider(LocalDodir provides dodir) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(Boje.bg)
+                .hvataDodir(dodir),
+        ) {
+            GornjaTraka(onNazad = { sesija.zakljucaj(); onNazad() })
+            BanerOtkljucano(preostaloS, onZakljucaj = sesija::zakljucaj)
+            if (probniPin) {
+                Box(Modifier.padding(horizontal = Razmaci.s6, vertical = Razmaci.s3)) {
+                    Baner(VrstaBanera.UPOZORENJE, "Još se koristi probni PIN 123456.", "Promijeni ga u meniju PIN vlasnika.")
                 }
-            },
-    ) {
-        GornjaTraka(onNazad = { sesija.zakljucaj(); onNazad() })
-        BanerOtkljucano(preostaloS, onZakljucaj = sesija::zakljucaj)
-        if (probniPin) {
-            Box(Modifier.padding(horizontal = Razmaci.s6, vertical = Razmaci.s3)) {
-                Baner(VrstaBanera.UPOZORENJE, "Još se koristi probni PIN 123456.", "Promijeni ga u meniju PIN vlasnika.")
             }
-        }
-        Row(Modifier.weight(1f).fillMaxWidth()) {
-            Meni(aktivna, onSekcija, brojaci)
-            Box(
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .padding(horizontal = 28.dp, vertical = 20.dp),
-            ) { sadrzaj() }
+            Row(Modifier.weight(1f).fillMaxWidth()) {
+                Meni(aktivna, onSekcija, brojaci)
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(horizontal = 28.dp, vertical = 20.dp),
+                ) { sadrzaj() }
+            }
         }
     }
 }

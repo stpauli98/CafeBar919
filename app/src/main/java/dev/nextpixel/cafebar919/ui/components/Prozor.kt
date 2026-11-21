@@ -76,6 +76,7 @@ fun Prozor(
         Box(
             Modifier
                 .fillMaxSize()
+                .hvataDodir(LocalDodir.current)
                 .background(Color.Black.copy(alpha = 0.66f))
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onZatvori)
                 // Tastatura podiže prozor; sadržaj se klizi, a dugmad ostaju vidljiva.
