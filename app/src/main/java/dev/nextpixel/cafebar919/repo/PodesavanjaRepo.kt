@@ -258,10 +258,12 @@ class PodesavanjaRepo(private val db: AppDatabase, private val clock: Clock) {
         Ishod.Ok
     }
 
-    suspend fun ukloniRazlog(id: Long) {
-        db.withTransaction {
-            val r = zDao.jednom().firstOrNull { it.id == id }
-            if (r != null) zDao.izmijeni(r.copy(aktivan = false))
-        }
+    /** Posljednji aktivan razlog se ne uklanja: poništavanje traži izabran razlog (spec 7 #8). */
+    suspend fun ukloniRazlog(id: Long): Ishod = db.withTransaction {
+        val svi = zDao.jednom()
+        val r = svi.firstOrNull { it.id == id && it.aktivan } ?: return@withTransaction Ishod.Ok
+        if (svi.count { it.aktivan } <= 1) return@withTransaction odbij(Odbijanje.POSLJEDNJI_RAZLOG)
+        zDao.izmijeni(r.copy(aktivan = false))
+        Ishod.Ok
     }
 }

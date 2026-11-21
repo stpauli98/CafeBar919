@@ -128,7 +128,9 @@ private fun Redovi(p: PostavkeE, vm: PravilaViewModel, razlozi: List<RazlogE>?) 
         Red("Razlozi poništavanja", "Nude se kao dugmad kad vlasnik poništava turu.") {
             FlowRow(Modifier.widthIn(max = 520.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 razlozi?.forEach { r ->
-                    Cip(r.tekst, izabran = false, onClick = {}, ukloni = { vm.ukloniRazlog(r.id) }, opisUklanjanja = "Ukloni ${r.tekst}")
+                    // Posljednji razlog se ne može ukloniti: poništavanje traži izabran razlog.
+                    val moze = razlozi.size > 1
+                    Cip(r.tekst, izabran = false, onClick = {}, ukloni = if (moze) ({ vm.ukloniRazlog(r.id) }) else null, opisUklanjanja = "Ukloni ${r.tekst}")
                 }
                 DodajRazlog(vm::otvoriRazlog)
             }

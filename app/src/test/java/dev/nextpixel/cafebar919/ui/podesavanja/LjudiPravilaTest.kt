@@ -255,6 +255,20 @@ class LjudiPravilaTest {
         assertFalse(repoPoziv { repo.razlozi.first().any { it.tekst == "Vraćeno" } })
     }
 
+    @Test fun pravila_posljednjiRazlogNemaDugmeZaUklanjanje() {
+        prikaziPravila()
+        cekaj("Pogrešan konobar")
+        val svi = repoPoziv { repo.razlozi.first() }
+        svi.dropLast(1).forEach { r ->
+            compose.onNodeWithContentDescription("Ukloni ${r.tekst}").performClick()
+            cekajNestanak(r.tekst)
+        }
+        val ostao = svi.last().tekst
+        assertTrue(postoji(ostao))
+        compose.onNodeWithContentDescription("Ukloni $ostao").assertDoesNotExist()
+        assertEquals(1, repoPoziv { repo.razlozi.first().size })
+    }
+
     @Test fun pravila_ispomocPrekidac() {
         prikaziPravila()
         cekaj("Ispomoć")

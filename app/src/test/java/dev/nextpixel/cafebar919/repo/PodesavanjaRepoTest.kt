@@ -142,9 +142,21 @@ class PodesavanjaRepoTest {
         assertEquals(Ishod.Ok, repo.dodajRazlog("Vraćeno"))
         assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_POSTOJI), repo.dodajRazlog(" vraćeno"))
         val id = repo.razlozi.first().first { it.tekst == "Vraćeno" }.id
-        repo.ukloniRazlog(id)
+        assertEquals(Ishod.Ok, repo.ukloniRazlog(id))
         assertFalse(repo.razlozi.first().any { it.tekst == "Vraćeno" })
     }
+    @Test fun razlog_posljednjiAktivniSeNeUklanja() = runTest {
+        val svi = repo.razlozi.first()
+        svi.dropLast(1).forEach { assertEquals(Ishod.Ok, repo.ukloniRazlog(it.id)) }
+        val ostali = repo.razlozi.first().single()
+        assertEquals(Ishod.Odbijeno(Odbijanje.POSLJEDNJI_RAZLOG), repo.ukloniRazlog(ostali.id))
+        assertEquals(listOf(ostali.id), repo.razlozi.first().map { it.id })
+        // Novi razlog se može dodati, a tada se stari smije ukloniti.
+        assertEquals(Ishod.Ok, repo.dodajRazlog("Vraćeno"))
+        assertEquals(Ishod.Ok, repo.ukloniRazlog(ostali.id))
+        assertEquals(listOf("Vraćeno"), repo.razlozi.first().map { it.tekst })
+    }
+
     @Test fun unosiUAktivnojNoci_saberePoMjeri() = runTest {
         val k = kat("Vino"); val bokal = mjeraId("Bokal")
         repo.sacuvajArtikal(null, "Crveno", k, listOf(bokal))

@@ -11,5 +11,6 @@ enum class Odbijanje {
     U_UPOTREBI,                                  // mjera/kategorija koju koristi aktivan artikal
     KATEGORIJA_ISKLJUCENA, MJERA_ISKLJUCENA,     // pri uključivanju artikla
     NATPIS_PRAZAN, NATPIS_PREDUG, U_ZBIRU_PRAZNO, U_ZBIRU_PREDUGO, LITRE_VAN_OPSEGA,
+    POSLJEDNJI_RAZLOG,                           // poništavanje traži izabran razlog: posljednji aktivan se ne uklanja
     VRIJEDNOST_VAN_OPSEGA                        // stepper V6
 }
