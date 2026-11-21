@@ -9,7 +9,9 @@ import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PromjenaPina
 import dev.nextpixel.cafebar919.repo.ProvjeraPina
 import dev.nextpixel.cafebar919.ui.podesavanja.PIN_01
+import dev.nextpixel.cafebar919.ui.podesavanja.cekajIstek
 import dev.nextpixel.cafebar919.ui.podesavanja.pin02
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
+import java.time.Instant
 
 const val PIN_PROMIJENJEN = "PIN je promijenjen."
 const val PIN_ZABRANJEN = "Taj PIN je lako pogoditi. Izaberi drugi."
@@ -56,9 +59,23 @@ class PromjenaPinaViewModel(private val pin: PinServis, private val clock: Clock
     private var trenutni = ""
     private var novi = ""
 
+    private var istek: Job? = null
+
     init {
         viewModelScope.launch {
-            pin.blokiranDo()?.let { do_ -> _stanje.update { it.copy(blokiran = true, greska = pin02(do_, clock)) } }
+            pin.blokiranDo()?.let { do_ ->
+                _stanje.update { it.copy(blokiran = true, greska = pin02(do_, clock)) }
+                cekajOdblokiranje(do_)
+            }
+        }
+    }
+
+    /** Kad blokada istekne, tastatura se vraća i poruka PIN-02 nestaje. */
+    private fun cekajOdblokiranje(do_: Instant) {
+        istek?.cancel()
+        istek = viewModelScope.launch {
+            cekajIstek(do_, clock)
+            _stanje.update { it.copy(blokiran = false, greska = null) }
         }
     }
 
@@ -91,7 +108,10 @@ class PromjenaPinaViewModel(private val pin: PinServis, private val clock: Clock
                             _stanje.value = s.copy(korak = KorakPina.NOVI)
                         }
                         is ProvjeraPina.Pogresan -> _stanje.value = s.copy(greska = PIN_01)
-                        is ProvjeraPina.Blokiran -> _stanje.value = s.copy(blokiran = true, greska = pin02(r.do_, clock))
+                        is ProvjeraPina.Blokiran -> {
+                            _stanje.value = s.copy(blokiran = true, greska = pin02(r.do_, clock))
+                            cekajOdblokiranje(r.do_)
+                        }
                     }
                 }
             }
@@ -123,7 +143,10 @@ class PromjenaPinaViewModel(private val pin: PinServis, private val clock: Clock
                 _poruke.emit(PIN_PROMIJENJEN)
             }
             PromjenaPina.PogresanTrenutni -> _stanje.value = PromjenaPinaStanje(greska = PIN_01)
-            is PromjenaPina.Blokiran -> _stanje.value = PromjenaPinaStanje(blokiran = true, greska = pin02(r.do_, clock))
+            is PromjenaPina.Blokiran -> {
+                _stanje.value = PromjenaPinaStanje(blokiran = true, greska = pin02(r.do_, clock))
+                cekajOdblokiranje(r.do_)
+            }
             PromjenaPina.Zabranjen -> _stanje.value = PromjenaPinaStanje(greska = PIN_ZABRANJEN)
             PromjenaPina.NeispravanFormat -> _stanje.value = PromjenaPinaStanje(greska = GRESKA_NEUSPJELO)
         }

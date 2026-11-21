@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -85,6 +86,40 @@ class PinProzorTest {
         compose.waitUntil(5_000) { postoji("PIN-02") }
         compose.onNodeWithText("Previše pogrešnih pokušaja. Novi pokušaj je moguć u 23:58. · PIN-02").assertExists()
         compose.onNodeWithText("1").assertIsNotEnabled()
+    }
+
+    @Test fun pinProzor_blokadaIstice_tastaturaSeVraca() {
+        var otkljucano = 0
+        compose.setContent { CafeBarTema { PinProzor(pin, { otkljucano++ }, {}, sat) } }
+        repeat(10) { i ->
+            unesi("000001")
+            if (i < 9) compose.waitUntil(5_000) { postoji("PIN-01") }
+            if (i < 9) compose.waitForIdle()
+        }
+        compose.waitUntil(5_000) { postoji("PIN-02") }
+        compose.onNodeWithText("1").assertIsNotEnabled()
+        sat.pomjeri(java.time.Duration.ofMinutes(5))
+        compose.waitUntil(10_000) { !postoji("PIN-02") }
+        compose.onNodeWithText("1").assertIsEnabled()
+        unesi("123456")
+        compose.waitUntil(5_000) { otkljucano == 1 }
+    }
+
+    @Test fun pinProzor_blokiranPriOtvaranju_istice() {
+        repeat(10) { kotlinx.coroutines.runBlocking { pin.provjeri("000001") } }
+        compose.setContent { CafeBarTema { PinProzor(pin, {}, {}, sat) } }
+        compose.waitUntil(5_000) { postoji("PIN-02") }
+        sat.pomjeri(java.time.Duration.ofMinutes(5))
+        compose.waitUntil(10_000) { !postoji("PIN-02") }
+        compose.onNodeWithText("1").assertIsEnabled()
+    }
+
+    @Test fun pin02_minutaSeZaokruzujeNagore() {
+        val utc = java.time.ZoneId.of("UTC")
+        val sat = java.time.Clock.fixed(java.time.Instant.parse("2026-11-21T22:00:00Z"), utc)
+        assertEquals("Previše pogrešnih pokušaja. Novi pokušaj je moguć u 22:06. · PIN-02", pin02(java.time.Instant.parse("2026-11-21T22:05:40Z"), sat))
+        assertEquals("Previše pogrešnih pokušaja. Novi pokušaj je moguć u 22:05. · PIN-02", pin02(java.time.Instant.parse("2026-11-21T22:05:00Z"), sat))
+        assertEquals("Previše pogrešnih pokušaja. Novi pokušaj je moguć u 22:06. · PIN-02", pin02(java.time.Instant.parse("2026-11-21T22:05:00.001Z"), sat))
     }
 
     @Test fun pinProzor_odustaniZatvara() {

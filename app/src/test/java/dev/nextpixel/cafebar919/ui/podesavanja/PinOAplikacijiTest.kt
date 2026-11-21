@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -175,6 +176,18 @@ class PinOAplikacijiTest {
         prikaziPromjenu()
         cekaj("Novi pokušaj je moguć u 18:05. · PIN-02")
         taster("1").assertIsNotEnabled()
+    }
+
+    @Test fun promjenaPina_blokadaIstice_tastaturaSeVraca() {
+        repeat(10) { poziv { pin.provjeri("000001") } }
+        prikaziPromjenu()
+        cekaj("Novi pokušaj je moguć u 18:05. · PIN-02")
+        taster("1").assertIsNotEnabled()
+        sat.pomjeri(java.time.Duration.ofMinutes(5))
+        compose.waitUntil(10_000) { shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(2)); !postoji("PIN-02") }
+        taster("1").assertIsEnabled()
+        upisi("123456")
+        cekaj("Korak 2 od 3 · Novi PIN")
     }
 
     @Test fun oAplikaciji_istorijaIzPostavki() {

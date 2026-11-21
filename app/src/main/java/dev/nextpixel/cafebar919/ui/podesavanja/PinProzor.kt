@@ -24,17 +24,29 @@ import dev.nextpixel.cafebar919.ui.components.Prozor
 import dev.nextpixel.cafebar919.ui.components.SporednoDugme
 import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.Tekst
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 private const val DUZINA_PIN = 6
 internal const val PIN_01 = "PIN nije tačan. Unesi ponovo. · PIN-01"
 
+/** Minut se zaokružuje naviše: blokada do 22:05:40 javlja 22:06, jer ranije pokušaj još ne prolazi. */
 internal fun pin02(do_: Instant, clock: Clock): String {
-    val vrijeme = DateTimeFormatter.ofPattern("HH:mm").withZone(clock.zone).format(do_)
+    val naMinut = do_.truncatedTo(ChronoUnit.MINUTES).let { if (it == do_) it else it.plus(1, ChronoUnit.MINUTES) }
+    val vrijeme = DateTimeFormatter.ofPattern("HH:mm").withZone(clock.zone).format(naMinut)
     return "Previše pogrešnih pokušaja. Novi pokušaj je moguć u $vrijeme. · PIN-02"
+}
+
+/** Čeka da ubrizgani sat dostigne `do_` (provjera svake sekunde, pa je pomjeranje sata uvijek vidljivo). */
+internal suspend fun cekajIstek(do_: Instant, clock: Clock) {
+    while (clock.instant().isBefore(do_)) {
+        delay(Duration.between(clock.instant(), do_).toMillis().coerceIn(1, 1000))
+    }
 }
 
 /**
@@ -50,16 +62,24 @@ fun PinProzor(
 ) {
     var cifre by remember { mutableStateOf("") }
     var poruka by remember { mutableStateOf<String?>(null) }
-    var blokiran by remember { mutableStateOf(false) }
+    var blokadaDo by remember { mutableStateOf<Instant?>(null) }
     var provjera by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val omogucen = !blokiran && !provjera
+    val omogucen = blokadaDo == null && !provjera
 
     LaunchedEffect(pin) {
         pin.blokiranDo()?.let { do_ ->
-            blokiran = true
+            blokadaDo = do_
             poruka = pin02(do_, clock)
         }
+    }
+
+    // Kad blokada istekne, tastatura se vraća i poruka PIN-02 nestaje.
+    LaunchedEffect(blokadaDo) {
+        val do_ = blokadaDo ?: return@LaunchedEffect
+        cekajIstek(do_, clock)
+        blokadaDo = null
+        poruka = null
     }
 
     fun dodajCifru(c: Char) {
@@ -77,7 +97,7 @@ fun PinProzor(
                 }
                 is ProvjeraPina.Pogresan -> poruka = PIN_01
                 is ProvjeraPina.Blokiran -> {
-                    blokiran = true
+                    blokadaDo = r.do_
                     poruka = pin02(r.do_, clock)
                 }
             }
