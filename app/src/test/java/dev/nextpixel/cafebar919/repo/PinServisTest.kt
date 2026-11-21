@@ -40,6 +40,17 @@ class PinServisTest {
         assertEquals(ProvjeraPina.Tacan, s.provjeri("123456"))
     }
 
+    @Test fun satPomjerenUnazad_blokadaNeTrajeDuzeOdPetMinuta() = runTest {
+        repeat(10) { s.provjeri("000001") }
+        sat.pomjeri(Duration.ofDays(-365))
+        val sada = sat.instant()
+        assertEquals(sada.plus(Duration.ofMinutes(5)), s.blokiranDo())
+        assertEquals(ProvjeraPina.Blokiran(sada.plus(Duration.ofMinutes(5))), s.provjeri("123456"))
+        // Skraćena blokada je sačuvana: poslije pet minuta PIN opet prolazi.
+        sat.pomjeri(Duration.ofMinutes(5))
+        assertEquals(ProvjeraPina.Tacan, s.provjeri("123456"))
+    }
+
     @Test fun tacanBriseBrojac() = runTest {
         repeat(9) { s.provjeri("000001") }
         s.provjeri("123456")

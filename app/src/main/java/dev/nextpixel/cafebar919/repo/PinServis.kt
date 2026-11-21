@@ -31,10 +31,17 @@ class PinServis(private val db: AppDatabase, private val clock: Clock) {
 
     suspend fun provjeri(pin: String): ProvjeraPina = db.withTransaction { pokusaj(pin) }
 
-    suspend fun blokiranDo(): Instant? {
-        val do_ = dao.jedne().pinBlokiranDo ?: return null
-        return Instant.ofEpochMilli(do_).takeIf { it.isAfter(clock.instant()) }
+    suspend fun blokiranDo(): Instant? = db.withTransaction {
+        val p = dao.jedne()
+        val sada = clock.instant()
+        val do_ = ogranici(p.pinBlokiranDo ?: return@withTransaction null, sada)
+        if (do_.toEpochMilli() != p.pinBlokiranDo) dao.izmijeni(p.copy(pinBlokiranDo = do_.toEpochMilli()))
+        do_.takeIf { it.isAfter(sada) }
     }
+
+    /** Sat vraćen unazad ne smije produžiti blokadu: najviše `Pin.BLOKADA` od sada. */
+    private fun ogranici(blokiranDoMs: Long, sada: Instant): Instant =
+        Instant.ofEpochMilli(blokiranDoMs).coerceAtMost(sada.plus(Pin.BLOKADA))
 
     suspend fun promijeni(trenutni: String, novi: String): PromjenaPina = db.withTransaction {
         when (val r = pokusaj(trenutni)) {
@@ -58,7 +65,11 @@ class PinServis(private val db: AppDatabase, private val clock: Clock) {
         var p: PostavkeE = dao.jedne()
         val blokiranDo = p.pinBlokiranDo
         if (blokiranDo != null) {
-            val do_ = Instant.ofEpochMilli(blokiranDo)
+            val do_ = ogranici(blokiranDo, sada)
+            if (do_.toEpochMilli() != blokiranDo) {
+                p = p.copy(pinBlokiranDo = do_.toEpochMilli())
+                dao.izmijeni(p)
+            }
             if (do_.isAfter(sada)) return ProvjeraPina.Blokiran(do_)
             p = p.copy(pinPogresnihZaredom = 0, pinBlokiranDo = null)
         }
