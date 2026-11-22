@@ -21,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -329,6 +330,41 @@ class UnosViewModelTest {
         assertEquals(vuleta, n.primalacId)
         assertEquals(listOf(StavkaNacrta(jack, doza, 1), StavkaNacrta(jelen, komad, 1)), Nacrt.izJsona(n.stavke))
         assertEquals(kljuc0, n.kljuc)
+    }
+
+    @Test fun nacrt_greskaCitanja_nePrepisujeSacuvaniNacrt() = runTest {
+        val sacuvane = listOf(StavkaNacrta(jack, doza, 2))
+        ture.sacuvajNacrt(kljuc0, vuleta, sacuvane)
+        // Čitanje nacrta pada dok je tabela preimenovana; red ostaje netaknut u `nacrt_skriven`.
+        sql("ALTER TABLE nacrt_ture RENAME TO nacrt_skriven")
+        val vm = noviVm()
+        cekajUslov { ShadowLog.getLogsForTag("CafeBar919").any { it.msg == "Nacrt nije pročitan" } }
+        assertNull(vm.stanje.value)
+
+        vm.izaberiPrimaoca(srdjan)
+        vm.dodaj(jelen, komad)
+        vm.potvrdi()
+        advanceUntilIdle()
+        assertNull(vm.stanje.value)
+        assertEquals(0, brojTura())
+
+        sql("ALTER TABLE nacrt_skriven RENAME TO nacrt_ture")
+        val n = ture.nacrt()
+        assertEquals(kljuc0, n.kljuc)
+        assertEquals(vuleta, n.primalacId)
+        assertEquals(sacuvane, Nacrt.izJsona(n.stavke))
+
+        // Ponovni pokušaj ide po virtuelnom vremenu (najviše 5 s između pokušaja).
+        advanceTimeBy(5_001)
+        val s = vm.cekaj()
+        assertEquals(vuleta, s.primalacId)
+        assertEquals(sacuvane, s.stavke)
+
+        vm.dodaj(jelen, komad)
+        cekajUslov { Nacrt.izJsona(ture.nacrt().stavke).size == 2 }
+        val poslije = ture.nacrt()
+        assertEquals(kljuc0, poslije.kljuc)
+        assertEquals(sacuvane + StavkaNacrta(jelen, komad, 1), Nacrt.izJsona(poslije.stavke))
     }
 
     // ---- filteri ----

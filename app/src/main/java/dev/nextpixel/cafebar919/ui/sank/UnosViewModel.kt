@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dev.nextpixel.cafebar919.AppContainer
 import dev.nextpixel.cafebar919.data.KategorijaE
+import dev.nextpixel.cafebar919.data.NacrtTureE
 import dev.nextpixel.cafebar919.data.NocE
 import dev.nextpixel.cafebar919.data.NocPrimalacE
 import dev.nextpixel.cafebar919.data.TuraSaStavkama
@@ -18,6 +19,7 @@ import dev.nextpixel.cafebar919.repo.Potvrda
 import dev.nextpixel.cafebar919.repo.TuraRepo
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,9 +37,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Clock
-import java.util.UUID
 
 private const val TAG = "CafeBar919"
+
+/** Pauze između pokušaja čitanja nacrta; poslije posljednje se pokušava svakih 5 s. */
+private val PAUZE_CITANJA_MS = listOf(1_000L, 2_000L, 4_000L)
+private const val PAUZA_CITANJA_MS = 5_000L
 
 /**
  * Stanje S1. `pica` je katalog filtriran kategorijom i upitom, `stavke` su samo važeće (piće i mjera još postoje),
@@ -115,19 +120,12 @@ class UnosViewModel(
         viewModelScope.launch { ucitaj(noc) }
     }
 
+    /** Nacrt i ključ su pročitani iz baze; prije toga se nacrt ne piše i tura se ne potvrđuje. */
+    private val ucitan: Boolean get() = kljuc != null && _tura.value != null
+
     /** Čita nacrt; primalac koji nije primalac aktivne noći postaje null. */
     private suspend fun ucitaj(noc: NocRepo) {
-        val n = try {
-            ture.nacrt()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            // Bez nacrta iz baze počinje prazna tura sa novim ključem; prva izmjena ga upisuje.
-            Log.e(TAG, "Nacrt nije pročitan", e)
-            kljuc = UUID.randomUUID().toString()
-            _tura.value = Tura(null, emptyList())
-            return
-        }
+        val n = procitajNacrt()
         // Ako se primaoci ne pročitaju, primaoca i dalje skriva `sastavi`, a potvrdu odbija repozitorij.
         val ids = try {
             noc.aktivna.first()?.let { a -> noc.primaoci(a.id).first().map { it.id } }.orEmpty()
@@ -139,6 +137,24 @@ class UnosViewModel(
         }
         kljuc = n.kljuc
         _tura.value = Tura(n.primalacId?.takeIf { ids == null || it in ids }, Nacrt.izJsona(n.stavke))
+    }
+
+    /**
+     * Ponavlja čitanje dok ne uspije (1 s, 2 s, 4 s, pa svakih 5 s). Nacrt je jedan red: izmišljen ključ bi
+     * prvom izmjenom prepisao nepotvrđenu turu sačuvanu prije restarta.
+     */
+    private suspend fun procitajNacrt(): NacrtTureE {
+        var pokusaj = 0
+        while (true) {
+            try {
+                return ture.nacrt()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Nacrt nije pročitan", e)
+                delay(PAUZE_CITANJA_MS.getOrElse(pokusaj++) { PAUZA_CITANJA_MS })
+            }
+        }
     }
 
     private fun sastavi(np: NocPodaci, kat: List<ArtikalPrikaz>, rok: Int, l: Lokalno, tura: Tura): UnosStanje {
@@ -167,6 +183,7 @@ class UnosViewModel(
 
     /** Dodir na izabranog primaoca ga odznačava. */
     fun izaberiPrimaoca(id: Long) {
+        if (!ucitan) return
         if (stanje.value?.primaoci?.any { it.id == id } != true) return
         izmijeni { it.copy(primalacId = if (it.primalacId == id) null else id) }
     }
@@ -174,6 +191,7 @@ class UnosViewModel(
     fun dodaj(artikalId: Long, mjeraId: Long) = promijeni(artikalId, mjeraId, 1)
 
     fun promijeni(artikalId: Long, mjeraId: Long, delta: Int) {
+        if (!ucitan) return
         val k = katalog.value ?: return
         if (k.none { p -> p.a.id == artikalId && p.mjere.any { it.id == mjeraId } }) return
         izmijeni { it.copy(stavke = Nacrt.promijeni(it.stavke, artikalId, mjeraId, delta)) }
@@ -181,7 +199,7 @@ class UnosViewModel(
 
     /** Mijenja turu u memoriji i odmah upisuje nacrt; dok traje upis ture, izmjene se ignorišu. */
     private fun izmijeni(promjena: (Tura) -> Tura) {
-        if (_upisuje.value) return
+        if (_upisuje.value || !ucitan) return
         val stara = _tura.value ?: return
         val nova = promjena(stara)
         if (nova == stara) return
@@ -223,7 +241,7 @@ class UnosViewModel(
      */
     fun potvrdi() {
         if (_upisuje.value) return
-        if (_tura.value == null || stanje.value == null) return
+        if (!ucitan || stanje.value == null) return
         _upisuje.value = true
         viewModelScope.launch {
             try {
