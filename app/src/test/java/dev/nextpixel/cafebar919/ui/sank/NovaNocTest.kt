@@ -1,9 +1,11 @@
 package dev.nextpixel.cafebar919.ui.sank
 
 import android.os.Looper
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
@@ -21,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,6 +31,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -156,5 +160,75 @@ class NovaNocTest {
             "Šank za prosuto je uvijek uključen. Datum noći ostaje subota 21. 11. i poslije ponoći.",
         ).assertExists()
         compose.onNodeWithText("Subota 21. 11.").assertExists()
+    }
+
+    private fun brojNoci(): Int = db.openHelper.readableDatabase.query("SELECT COUNT(*) FROM noc").use { it.moveToFirst(); it.getInt(0) }
+
+    private fun cekajAktivnu() = runBlocking {
+        var n = noc.aktivna.first()
+        repeat(50) { if (n == null) { shadowOf(Looper.getMainLooper()).idle(); Thread.sleep(50); n = noc.aktivna.first() } }
+        n
+    }
+
+    @Test fun s0_dvaDodiraNaOtvoriJednaNoc() {
+        prikazi()
+        cekaj("Vuleta")
+        compose.onNodeWithText("Otvori noć · 0 radnika").performClick()
+        cekaj("Upisuje se…")
+        compose.onNodeWithText("Upisuje se…").performClick()
+        vm.otvoriNoc()
+        assertNotNull(cekajAktivnu())
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(1, brojNoci())
+        assertTrue(vm.stanje.value.otvara)
+        assertTrue(postoji("Upisuje se…"))
+    }
+
+    @Test fun s0_otvoriNocBezIkogaSamoSank() {
+        prikazi()
+        cekaj("Vuleta")
+        compose.onNodeWithText("Otvori noć · 0 radnika").assertIsEnabled().performClick()
+        val aktivna = cekajAktivnu()
+        assertNotNull(aktivna)
+        val primaoci = runBlocking { noc.primaoci(aktivna!!.id).first() }
+        assertEquals(listOf("Šank"), primaoci.map { it.ime })
+    }
+
+    @Test fun s0_ispomocIskljucena_neUlaziUNoc() {
+        prikazi()
+        cekaj("Vuleta")
+        dodajIspomoc("Dejan")
+        cekaj("Otvori noć · 1 radnik")
+        runBlocking { podesavanja.postaviIspomoc(false) }
+        cekajUslov { !postoji("Dejan") }
+        compose.onNodeWithText("Otvori noć · 0 radnika").performClick()
+        val aktivna = cekajAktivnu()
+        assertNotNull(aktivna)
+        val primaoci = runBlocking { noc.primaoci(aktivna!!.id).first() }
+        assertEquals(emptyList<Any>(), primaoci.filter { it.vrsta == VrstaPrimaoca.ISPOMOC })
+    }
+
+    @Test fun s0_greskaPriOtvaranju_baner() {
+        prikazi()
+        cekaj("Vuleta")
+        db.openHelper.writableDatabase.execSQL("CREATE TRIGGER kvar BEFORE INSERT ON noc BEGIN SELECT RAISE(ABORT, 'kvar'); END")
+        compose.onNodeWithText("Otvori noć · 0 radnika").performClick()
+        cekajUslov { compose.onAllNodes(hasText("Noć nije otvorena.", substring = true)).fetchSemanticsNodes().isNotEmpty() }
+        assertEquals(0, brojNoci())
+        db.openHelper.writableDatabase.execSQL("DROP TRIGGER kvar")
+        compose.onNodeWithText("Otvori noć · 0 radnika").performClick()
+        assertNotNull(cekajAktivnu())
+        assertEquals(1, brojNoci())
+    }
+
+    @Test fun s0_datumSeOsvjezava() {
+        prikazi()
+        cekaj("Subota 21. 11.")
+        sat.pomjeri(Duration.ofDays(1))
+        vm.osvjeziDan()
+        cekaj("Nedjelja 22. 11.")
+        compose.onNodeWithText(
+            "Šank za prosuto je uvijek uključen. Datum noći ostaje nedjelja 22. 11. i poslije ponoći.",
+        ).assertExists()
     }
 }

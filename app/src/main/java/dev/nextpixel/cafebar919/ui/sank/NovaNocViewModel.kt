@@ -1,5 +1,6 @@
 package dev.nextpixel.cafebar919.ui.sank
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import java.time.Clock
 import java.time.LocalDate
 
@@ -36,6 +38,8 @@ data class NovaNocStanje(
     val prozorIspomoci: String?,
     val greskaIspomoci: String?,
     val otvara: Boolean,
+    /** Otvaranje nije uspjelo (baza); baner iznad dugmeta, čisti se pri sljedećem pokušaju. */
+    val greskaOtvaranja: Boolean = false,
 ) {
     /** Označeni stalni radnici (samo prikazani) i označena ispomoć (samo kad je ispomoć dozvoljena). */
     val brojRadnika: Int
@@ -46,17 +50,18 @@ data class NovaNocStanje(
 class NovaNocViewModel(
     podesavanja: PodesavanjaRepo,
     private val noc: NocRepo,
-    clock: Clock,
+    private val clock: Clock,
     private val poslijeOtvaranja: () -> Unit,
 ) : ViewModel() {
-    private val danas = LocalDate.now(clock)
+    private val _danas = MutableStateFlow(LocalDate.now(clock))
     private val _oznaceni = MutableStateFlow<Set<Long>>(emptySet())
     private val _ispomoc = MutableStateFlow<List<Pair<String, Boolean>>>(emptyList())
     private val _prozor = MutableStateFlow<String?>(null)
     private val _greska = MutableStateFlow<String?>(null)
     private val _otvara = MutableStateFlow(false)
+    private val _greskaOtvaranja = MutableStateFlow(false)
 
-    private val dio1 = combine(podesavanja.radnici, podesavanja.postavke, _oznaceni, _ispomoc) { radnici, postavke, oznaceni, ispomoc ->
+    private val dio1 = combine(podesavanja.radnici, podesavanja.postavke, _oznaceni, _ispomoc, _danas) { radnici, postavke, oznaceni, ispomoc, danas ->
         val aktivni = radnici.filter { it.aktivan }
         NovaNocStanje(
             danas = danas,
@@ -71,12 +76,12 @@ class NovaNocViewModel(
         )
     }
 
-    val stanje: StateFlow<NovaNocStanje> = combine(dio1, _prozor, _greska, _otvara) { s, prozor, greska, otvara ->
-        s.copy(prozorIspomoci = prozor, greskaIspomoci = greska, otvara = otvara)
+    val stanje: StateFlow<NovaNocStanje> = combine(dio1, _prozor, _greska, _otvara, _greskaOtvaranja) { s, prozor, greska, otvara, greskaOtvaranja ->
+        s.copy(prozorIspomoci = prozor, greskaIspomoci = greska, otvara = otvara, greskaOtvaranja = greskaOtvaranja)
     }.stateIn(
         viewModelScope,
         SharingStarted.Eagerly,
-        NovaNocStanje(danas, emptyList(), emptyList(), emptySet(), emptyList(), true, null, null, false),
+        NovaNocStanje(_danas.value, emptyList(), emptyList(), emptySet(), emptyList(), true, null, null, false),
     )
 
     fun prebaci(radnikId: Long) = _oznaceni.update { if (radnikId in it) it - radnikId else it + radnikId }
@@ -118,10 +123,14 @@ class NovaNocViewModel(
         }
     }
 
+    /** Ponovo računa datum iz sata (tablet ostavljen na S0 preko ponoći). */
+    fun osvjeziDan() { _danas.value = LocalDate.now(clock) }
+
     /** Otvara noć sa označenima; dok traje, drugi dodir se ignoriše. */
     fun otvoriNoc() {
         if (_otvara.value) return
         _otvara.value = true
+        _greskaOtvaranja.value = false
         val s = stanje.value
         val radnici = (s.konobari + s.zaSankom).filter { it.id in s.oznaceni }.map { it.id }
         val ispomoc = if (s.ispomocDozvoljena) s.ispomoc.filter { it.second }.map { it.first } else emptyList()
@@ -129,7 +138,11 @@ class NovaNocViewModel(
             try {
                 noc.otvoriNoc(radnici, ispomoc)
                 poslijeOtvaranja()
-            } finally {
+                // `otvara` ostaje true: ekran odlazi sa S0 čim noć postane aktivna.
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Log.e("CafeBar919", "Noć nije otvorena", e)
+                _greskaOtvaranja.value = true
                 _otvara.value = false
             }
         }

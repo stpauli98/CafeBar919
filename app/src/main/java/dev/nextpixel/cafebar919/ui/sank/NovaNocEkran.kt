@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import dev.nextpixel.cafebar919.domain.Format
+import dev.nextpixel.cafebar919.ui.components.Baner
 import dev.nextpixel.cafebar919.ui.components.GlavnoDugme
+import dev.nextpixel.cafebar919.ui.components.VrstaBanera
+import kotlinx.coroutines.delay
 import dev.nextpixel.cafebar919.ui.theme.Boje
 import dev.nextpixel.cafebar919.ui.theme.Oblici
 import dev.nextpixel.cafebar919.ui.theme.Tekst
@@ -59,6 +63,12 @@ import dev.nextpixel.cafebar919.ui.theme.Tekst
 @Composable
 fun NovaNocEkran(vm: NovaNocViewModel, onPodesavanja: () -> Unit) {
     val s by vm.stanje.collectAsState()
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60_000)
+            vm.osvjeziDan()
+        }
+    }
     Column(Modifier.fillMaxSize().background(Boje.bg)) {
         GornjaTraka(datum = Format.datumNoci(s.danas)) {
             TrakaDugme("Podešavanja", Icons.Outlined.Lock, onPodesavanja)
@@ -90,6 +100,11 @@ fun NovaNocEkran(vm: NovaNocViewModel, onPodesavanja: () -> Unit) {
                     }
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    if (s.greskaOtvaranja) {
+                        Box(Modifier.width(920.dp)) {
+                            Baner(VrstaBanera.GRESKA, "Noć nije otvorena.", "Tablet nije uspio da sačuva podatke. Pokušaj ponovo.")
+                        }
+                    }
                     GlavnoDugme(
                         tekst = "Otvori noć · " + Format.brojac(s.brojRadnika, "radnik", "radnika", "radnika"),
                         onClick = vm::otvoriNoc,
