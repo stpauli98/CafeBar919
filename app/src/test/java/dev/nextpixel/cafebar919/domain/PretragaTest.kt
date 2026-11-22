@@ -14,4 +14,11 @@ class PretragaTest {
         assertFalse(Pretraga.odgovara("Jelen pivo", "mojito"))
         assertTrue(Pretraga.odgovara("Jelen pivo", "   "))
     }
+
+    @Test fun odgovara_upitSaRazdvajacima() {
+        assertTrue(Pretraga.odgovara("Coca-Cola", "coca-cola"))
+        assertTrue(Pretraga.odgovara("Jack Daniel’s", "daniel's"))
+        assertTrue(Pretraga.odgovara("Jack Daniel’s", "daniel’s"))
+        assertFalse(Pretraga.odgovara("Jack Daniel’s", "jack-x"))
+    }
 }

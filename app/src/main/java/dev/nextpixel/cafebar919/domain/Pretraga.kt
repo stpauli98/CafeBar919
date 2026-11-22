@@ -6,7 +6,6 @@ import java.util.Locale
 object Pretraga {
     private val SR = Locale.forLanguageTag("sr")
     private val OZNAKE = Regex("\\p{Mn}+")
-    private val RAZMACI = Regex("\\s+")
     private val RAZDVAJANJE = Regex("[\\s\\-–’'.,/]+")
 
     fun normalizuj(s: String): String =
@@ -14,7 +13,7 @@ object Pretraga {
 
     /** Svaka riječ upita mora biti početak neke riječi naziva; prazan upit odgovara svemu. */
     fun odgovara(naziv: String, upit: String): Boolean {
-        val rijeciUpita = normalizuj(upit).trim().split(RAZMACI).filter { it.isNotEmpty() }
+        val rijeciUpita = normalizuj(upit).split(RAZDVAJANJE).filter { it.isNotEmpty() }
         if (rijeciUpita.isEmpty()) return true
         val rijeciNaziva = normalizuj(naziv).split(RAZDVAJANJE).filter { it.isNotEmpty() }
         return rijeciUpita.all { r -> rijeciNaziva.any { it.startsWith(r) } }
