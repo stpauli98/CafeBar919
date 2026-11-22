@@ -182,6 +182,14 @@ Ovo su moje odluke (graditelj ih ne mijenja bez pitanja). Na kraju izrade prepra
 | 31 | najmanji tekst 12 px (caption) vs „ništa ispod 13 px“ | ostaje 12 px samo za CAPS labele sekcija, kao u dizajnu |
 | 32 | odakle se otvara S1.3 (poništavanje poslije roka) | po O5: dodir na turu u traci „Posljednje“ **ili** na turu u S2.2 dok je noć otvorena. Traka drži posljednjih 10 tura (vodoravni skrol). |
 | 33 | smanjenje „Istorija noći“ u V6 trajno briše noći | ako bi nova vrijednost obrisala neku postojeću noć, prozor „Obrisati stare noći?“ / „{n} noći starijih od {d} dana biće obrisano pri sljedećem pokretanju.“ / „Nastavi unos“ i „Smanji istoriju“ |
+| 34 | Početno stanje S0 | nijedan radnik nije označen. Radnik označava dodirom. Spisak čine aktivni radnici redoslijedom iz V2. |
+| 35 | Pretraga (T1) | ne razlikuje velika i mala slova ni kvačice („sljiva“ nalazi „Rakija šljiva“, „đ“ = „d“). Svaka upisana riječ mora biti početak neke riječi u nazivu („jack d“ nalazi „Jack Daniel’s“, „cola“ nalazi „Coca-Cola“). Pretraga ide kroz **sva** pića: upis u polje bira čip „Sve“. |
+| 36 | Čipovi kategorija na S1 | „Sve“ plus aktivne kategorije koje imaju bar jedno aktivno piće, redoslijedom iz V5. Ako izabrana kategorija nestane, bira se „Sve“. |
+| 37 | Količina | jedna stavka ide od 1 do 99. Na 99 se plus i dodir na pločicu ignorišu. |
+| 38 | Sat vraćen unazad | ako je `sada < potvrdjena_u`, rok bez PIN-a se smatra isteklim. Takva tura se poništava PIN-om (faza 3). |
+| 39 | Piće ili mjera isključeni dok su u nacrtu | stavka nestaje iz ture na ekranu i ne upisuje se. Ako ne ostane nijedna stavka, „Potvrdi“ je onemogućeno kao za praznu turu. |
+| 40 | Ime ispomoći | očišćeno (`Validacija.ocisti`), 1–20 znakova (`Validacija.IME_MAX`), ne smije biti jednako (bez obzira na velika slova) imenu stalnog radnika na spisku, drugoj ispomoći te noći ni riječi „Šank“. |
+| 41 | odbrojavanje na traci „Posljednje“ | traka uvijek prikazuje „Poništi · {s} s“ dok traje rok bez PIN-a; poslije roka dugme nestaje, a tura se poništava PIN-om (faza 3). |
 
 ## 8. Faze
 
@@ -196,6 +204,7 @@ Svaka faza završava APK-om koji se proba na emulatoru tableta, i prolaskom svih
 
 **Faza 2 — noć i unos ture**
 - S0, S0.1, S1 (sa pretragom T1 i stanjem bez pića T2), nacrt ture koji preživljava restart, potvrda (transakcija, UUID, toast), traka „Posljednje“ sa poništavanjem u roku, UPIS-01, PROSTOR-01, `KEEP_SCREEN_ON`.
+- **Urađeno 22. 11. 2026** (versionCode 2, „1.1“). APK je instaliran preko faze 1 i podaci su ostali.
 
 **Faza 3 — poništavanje, pregled, istorija**
 - S1.3 (PIN + razlog, T5), S2 / S2.1 / S2.2 (T3, T4), S1.2 Završi noć, S3 Istorija + T7 (baner stare noći, samo čitanje), automatsko brisanje starih noći.
@@ -220,7 +229,13 @@ Baza postoji samo na tabletu. Nova verzija mora se instalirati **preko** stare (
 
 ## 10. Otvoreno za korisnika
 
-Nema otvorenih pitanja. Oba pitanja iz provjere (litre i zbir po mjerama) korisnik je riješio, a upisana su u poglavlje 5.
+Oba pitanja iz provjere (litre i zbir po mjerama) korisnik je riješio, a upisana su u poglavlje 5.
+
+Novi tekstovi faze 2 koji nisu u Paperu i čekaju odobrenje korisnika:
+- „Upiši ime.“ (prazno ime ispomoći)
+- „To ime već postoji večeras.“ (duplo ime ispomoći)
+- „Ime je predugo.“ (ime ispomoći duže od 20 znakova)
+- „Noć nije otvorena.“ / „Tablet nije uspio da sačuva podatke. Pokušaj ponovo.“ (baner greške na S0)
 
 ## 11. Ostaje graditelju
 
