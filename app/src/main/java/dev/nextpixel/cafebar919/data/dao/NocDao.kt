@@ -56,6 +56,9 @@ interface NocDao {
 
     @Update suspend fun izmijeniTuru(t: TuraE)
 
+    @Query("SELECT COUNT(*) FROM stavka_ture WHERE tura_id = :turaId")
+    suspend fun brojStavki(turaId: Long): Int
+
     @Transaction
     @Query("SELECT * FROM tura WHERE noc_id = :nocId ORDER BY id DESC LIMIT :n")
     fun posljednjeTure(nocId: Long, n: Int): Flow<List<TuraSaStavkama>>

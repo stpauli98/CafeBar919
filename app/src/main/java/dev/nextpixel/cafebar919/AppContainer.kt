@@ -7,6 +7,7 @@ import dev.nextpixel.cafebar919.data.StanjeBaze
 import dev.nextpixel.cafebar919.repo.NocRepo
 import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
+import dev.nextpixel.cafebar919.repo.TuraRepo
 import dev.nextpixel.cafebar919.ui.podesavanja.PodesavanjaSesija
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +56,17 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         val stanje = otvaranjeBaze.stanje.value
         check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
         return NocRepo(stanje.db, clock).also { nocRepo = it }
+    }
+
+    private var turaRepo: TuraRepo? = null
+
+    /** Pravi repozitorij ture jednom, tek kad je baza spremna. */
+    @Synchronized
+    fun ture(): TuraRepo {
+        turaRepo?.let { return it }
+        val stanje = otvaranjeBaze.stanje.value
+        check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
+        return TuraRepo(stanje.db, clock).also { turaRepo = it }
     }
 
     /** Posljednja vrijednost „zaključavanje_s“ iz postavki; 120 s dok baza nije spremna. */
