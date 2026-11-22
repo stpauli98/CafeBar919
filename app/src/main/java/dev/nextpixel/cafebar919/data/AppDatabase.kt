@@ -15,7 +15,7 @@ import dev.nextpixel.cafebar919.data.dao.RadnikDao
 import dev.nextpixel.cafebar919.data.dao.RazlogDao
 
 /** `synchronous = FULL`: potvrđena tura ne smije nestati ni kad tablet ostane bez struje. */
-private object TrajniUpis : RoomDatabase.Callback() {
+internal object TrajniUpis : RoomDatabase.Callback() {
     override fun onOpen(db: SupportSQLiteDatabase) {
         db.query("PRAGMA synchronous = FULL").close()
     }
