@@ -42,7 +42,7 @@ import java.time.ZoneId
 
 /**
  * Donja traka S1 (Paper: visina 72, gornja linija 1, padding 24, razmak 12): „POSLJEDNJE“ i vodoravni red čipova
- * najnovijih tura. Dok traje rok bez PIN-a, čip ima dugme „Poništi · {odbrojavanje}“. Čipovi nisu dodirljivi (S1.3 nije u fazi 2).
+ * najnovijih tura. Dok traje rok bez PIN-a, čip ima dugme „Poništi · {s} s“. Čipovi nisu dodirljivi (S1.3 nije u fazi 2).
  */
 @Composable
 internal fun PosljednjeTraka(
@@ -105,7 +105,7 @@ private fun Cip(t: TuraSaStavkama, rokS: Int, sadaMs: Long, zona: ZoneId, onPoni
             overflow = TextOverflow.Ellipsis,
         )
         if (t.tura.ponistenaBezPina) Znacka("Poništeno bez PIN-a", VrstaZnacke.PONISTENO_BEZ_PINA)
-        if (preostalo > 0) PonistiDugme(Format.odbrojavanje(preostalo)) { onPonisti(t.tura.id) }
+        if (preostalo > 0) PonistiDugme("$preostalo s") { onPonisti(t.tura.id) }
     }
 }
 

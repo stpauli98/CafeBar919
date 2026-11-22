@@ -125,7 +125,7 @@ class UnosEkranTest {
         compose.onNodeWithText("Potvrdi · Vuleta").performClick()
         cekaj("Upisano: Vuleta · 1 stavka")
         cekaj("Jack Daniel’s doza 2")
-        cekaj("Poništi · 1 min")
+        cekaj("Poništi · 60 s")
         compose.onNodeWithText("Poništi").assertExists()
         cekaj("TURA")
         cekaj("Nova tura")
@@ -183,16 +183,19 @@ class UnosEkranTest {
         dodirni("Jack Daniel’s")
         cekaj("Potvrdi · Vuleta")
         compose.onNodeWithText("Potvrdi · Vuleta").performClick()
-        cekaj("Poništi · 1 min")
+        cekaj("Poništi · 60 s")
     }
 
     @Test fun ponistiUTraci_nestajePoslijeRoka() {
         podaci()
         prikazi()
         potvrdiTuru()
-        sat.pomjeri(Duration.ofSeconds(61))
+        sat.pomjeri(Duration.ofSeconds(30))
         compose.mainClock.advanceTimeBy(1100)
-        cekajUslov { !postoji("Poništi · 1 min") }
+        cekaj("Poništi · 30 s")
+        sat.pomjeri(Duration.ofSeconds(31))
+        compose.mainClock.advanceTimeBy(1100)
+        cekajUslov { !postoji("Poništi · 60 s") }
         assertTrue(compose.onAllNodesWithText("Poništi · ", substring = true).fetchSemanticsNodes().isEmpty())
         // Sama tura ostaje u traci.
         compose.onNodeWithText("Jack Daniel’s doza 2").assertExists()
@@ -202,7 +205,7 @@ class UnosEkranTest {
         podaci()
         prikazi()
         potvrdiTuru()
-        compose.onNodeWithText("Poništi · 1 min").performClick()
+        compose.onNodeWithText("Poništi · 60 s").performClick()
         cekaj("Poništeno bez PIN-a")
         cekajUslov { compose.onAllNodesWithText("Poništi · ", substring = true).fetchSemanticsNodes().isEmpty() }
         val rezultati = mutableListOf<TextLayoutResult>()
