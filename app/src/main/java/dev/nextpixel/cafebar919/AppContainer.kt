@@ -4,6 +4,7 @@ import android.content.Context
 import dev.nextpixel.cafebar919.data.AppDatabase
 import dev.nextpixel.cafebar919.data.OtvaranjeBaze
 import dev.nextpixel.cafebar919.data.StanjeBaze
+import dev.nextpixel.cafebar919.repo.NocRepo
 import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
 import dev.nextpixel.cafebar919.ui.podesavanja.PodesavanjaSesija
@@ -43,6 +44,17 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         val stanje = otvaranjeBaze.stanje.value
         check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
         return PinServis(stanje.db, clock).also { pinServis = it }
+    }
+
+    private var nocRepo: NocRepo? = null
+
+    /** Pravi repozitorij noći jednom, tek kad je baza spremna. */
+    @Synchronized
+    fun noc(): NocRepo {
+        nocRepo?.let { return it }
+        val stanje = otvaranjeBaze.stanje.value
+        check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
+        return NocRepo(stanje.db, clock).also { nocRepo = it }
     }
 
     /** Posljednja vrijednost „zaključavanje_s“ iz postavki; 120 s dok baza nije spremna. */
