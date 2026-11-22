@@ -78,6 +78,16 @@ class NocRepoTest {
         val p = repo.primaoci(repo.otvoriNoc(emptyList(), listOf("  ", "Šank", "Dejan", "dejan", "Era"))).first()
         assertEquals(listOf("Dejan", "Era", "Šank"), p.map { it.ime })
     }
+    @Test fun otvoriNoc_ispomocSaImenomRadnikaSePreskace() = runTest {
+        val p = repo.primaoci(repo.otvoriNoc(emptyList(), listOf("vuleta"))).first()
+        assertEquals(listOf("Šank"), p.map { it.ime })
+    }
+    @Test fun otvoriNoc_ispomocSaImenomIskljucenogRadnikaJeDozvoljena() = runTest {
+        podesavanja.postaviAktivanRadnik(ids("Smitran").single(), false)
+        val p = repo.primaoci(repo.otvoriNoc(emptyList(), listOf("Smitran"))).first()
+        assertEquals(listOf("Smitran", "Šank"), p.map { it.ime })
+        assertEquals(listOf(ISPOMOC, SANK), p.map { it.vrsta })
+    }
     @Test fun datumNociOstajePoslijePonoci() = runTest {
         val noc = repo.otvoriNoc(emptyList(), emptyList())
         sat.pomjeri(Duration.ofHours(2))

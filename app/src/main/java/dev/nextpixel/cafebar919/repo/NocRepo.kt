@@ -28,7 +28,8 @@ class NocRepo(private val db: AppDatabase, private val clock: Clock) {
         val sada = clock.millis()
         val nocId = dao.dodajNoc(NocE(datum = LocalDate.now(clock).toEpochDay(), otvorenaU = sada, zatvorenaU = null))
 
-        val izabrani = db.radnikDao().jednom().filter { it.aktivan && it.id in radniciIds }
+        val aktivni = db.radnikDao().jednom().filter { it.aktivan }
+        val izabrani = aktivni.filter { it.id in radniciIds }
         val redom = izabrani.filter { it.uloga == Uloga.KONOBAR } + izabrani.filter { it.uloga == Uloga.ZA_SANKOM }
         val primaoci = mutableListOf<NocPrimalacE>()
         fun dodaj(vrsta: VrstaPrimaoca, radnikId: Long?, ime: String) {
@@ -36,7 +37,7 @@ class NocRepo(private val db: AppDatabase, private val clock: Clock) {
         }
         redom.forEach { dodaj(if (it.uloga == Uloga.KONOBAR) VrstaPrimaoca.KONOBAR else VrstaPrimaoca.ZA_SANKOM, it.id, it.ime) }
 
-        val zauzeta = mutableListOf<String>()
+        val zauzeta = aktivni.mapTo(mutableListOf()) { it.ime }
         for (sirovo in ispomoc) {
             if (Validacija.provjeriIspomoc(sirovo, zauzeta) != Ishod.Ok) continue
             val ime = Validacija.ocisti(sirovo)
