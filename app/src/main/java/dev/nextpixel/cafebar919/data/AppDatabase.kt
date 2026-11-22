@@ -47,7 +47,8 @@ abstract class AppDatabase : RoomDatabase() {
             val builder = if (imeFajla == null) {
                 Room.inMemoryDatabaseBuilder(app, AppDatabase::class.java)
             } else {
-                Room.databaseBuilder(app, AppDatabase::class.java, imeFajla)
+                // Oštećen fajl se ne briše (BAZA-01), vidi BezBrisanjaBaze.
+                Room.databaseBuilder(app, AppDatabase::class.java, imeFajla).openHelperFactory(BezBrisanjaBaze())
             }
             return builder.addCallback(PocetniPodaci.callback).addCallback(TrajniUpis).build()
         }
