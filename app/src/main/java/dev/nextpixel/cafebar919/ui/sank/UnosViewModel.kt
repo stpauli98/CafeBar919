@@ -56,6 +56,8 @@ data class UnosStanje(
     val izabranaKategorija: Long?,
     val upit: String,
     val pica: List<ArtikalPrikaz>,
+    /** Cijeli katalog bez filtera: stavke ture se imenuju iz njega i kad ih filter sakrije sa pločica. */
+    val katalog: List<ArtikalPrikaz>,
     val imaPica: Boolean,
     val primalacId: Long?,
     val stavke: List<StavkaNacrta>,
@@ -169,6 +171,7 @@ class UnosViewModel(
             izabranaKategorija = izabrana,
             upit = l.filteri.upit,
             pica = pica,
+            katalog = kat,
             imaPica = kat.isNotEmpty(),
             primalacId = tura.primalacId?.takeIf { id -> np.primaoci.any { it.id == id } },
             stavke = TuraRepo.vazeceStavke(tura.stavke, kat),
