@@ -1,0 +1,790 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "b508082483436c09d51b50728a007f3e",
+    "entities": [
+      {
+        "tableName": "kategorija",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `naziv` TEXT NOT NULL, `redoslijed` INTEGER NOT NULL, `aktivna` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "naziv",
+            "columnName": "naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aktivna",
+            "columnName": "aktivna",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "mjera",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `naziv` TEXT NOT NULL, `natpis` TEXT NOT NULL, `u_zbiru` TEXT NOT NULL, `litara` REAL, `redoslijed` INTEGER NOT NULL, `aktivna` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "naziv",
+            "columnName": "naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "natpis",
+            "columnName": "natpis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uZbiru",
+            "columnName": "u_zbiru",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "litara",
+            "columnName": "litara",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aktivna",
+            "columnName": "aktivna",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "artikal",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `naziv` TEXT NOT NULL, `kategorija_id` INTEGER NOT NULL, `redoslijed` INTEGER NOT NULL, `aktivan` INTEGER NOT NULL, FOREIGN KEY(`kategorija_id`) REFERENCES `kategorija`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "naziv",
+            "columnName": "naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kategorijaId",
+            "columnName": "kategorija_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aktivan",
+            "columnName": "aktivan",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_artikal_kategorija_id",
+            "unique": false,
+            "columnNames": [
+              "kategorija_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_artikal_kategorija_id` ON `${TABLE_NAME}` (`kategorija_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "kategorija",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "kategorija_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "artikal_mjera",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`artikal_id` INTEGER NOT NULL, `mjera_id` INTEGER NOT NULL, `redoslijed` INTEGER NOT NULL, PRIMARY KEY(`artikal_id`, `mjera_id`), FOREIGN KEY(`artikal_id`) REFERENCES `artikal`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`mjera_id`) REFERENCES `mjera`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "artikalId",
+            "columnName": "artikal_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraId",
+            "columnName": "mjera_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "artikal_id",
+            "mjera_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_artikal_mjera_mjera_id",
+            "unique": false,
+            "columnNames": [
+              "mjera_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_artikal_mjera_mjera_id` ON `${TABLE_NAME}` (`mjera_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "artikal",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "artikal_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "mjera",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mjera_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "radnik",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ime` TEXT NOT NULL, `uloga` TEXT NOT NULL, `aktivan` INTEGER NOT NULL, `redoslijed` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ime",
+            "columnName": "ime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uloga",
+            "columnName": "uloga",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aktivan",
+            "columnName": "aktivan",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "razlog_ponistavanja",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tekst` TEXT NOT NULL, `redoslijed` INTEGER NOT NULL, `aktivan` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tekst",
+            "columnName": "tekst",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aktivan",
+            "columnName": "aktivan",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "postavke",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `rok_bez_pina_s` INTEGER NOT NULL, `istorija_dana` INTEGER NOT NULL, `zakljucavanje_s` INTEGER NOT NULL, `ispomoc_dozvoljena` INTEGER NOT NULL, `pin_hes` TEXT NOT NULL, `pin_so` TEXT NOT NULL, `pin_probni` INTEGER NOT NULL, `pin_pogresnih_zaredom` INTEGER NOT NULL, `pin_blokiran_do` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rokBezPinaS",
+            "columnName": "rok_bez_pina_s",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "istorijaDana",
+            "columnName": "istorija_dana",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "zakljucavanjeS",
+            "columnName": "zakljucavanje_s",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ispomocDozvoljena",
+            "columnName": "ispomoc_dozvoljena",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinHes",
+            "columnName": "pin_hes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinSo",
+            "columnName": "pin_so",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinProbni",
+            "columnName": "pin_probni",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinPogresnihZaredom",
+            "columnName": "pin_pogresnih_zaredom",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinBlokiranDo",
+            "columnName": "pin_blokiran_do",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "noc",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `datum` INTEGER NOT NULL, `otvorena_u` INTEGER NOT NULL, `zatvorena_u` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "datum",
+            "columnName": "datum",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "otvorenaU",
+            "columnName": "otvorena_u",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "zatvorenaU",
+            "columnName": "zatvorena_u",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "noc_primalac",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noc_id` INTEGER NOT NULL, `vrsta` TEXT NOT NULL, `radnik_id` INTEGER, `ime` TEXT NOT NULL, `redoslijed` INTEGER NOT NULL, FOREIGN KEY(`noc_id`) REFERENCES `noc`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nocId",
+            "columnName": "noc_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vrsta",
+            "columnName": "vrsta",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "radnikId",
+            "columnName": "radnik_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ime",
+            "columnName": "ime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redoslijed",
+            "columnName": "redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_noc_primalac_noc_id",
+            "unique": false,
+            "columnNames": [
+              "noc_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_noc_primalac_noc_id` ON `${TABLE_NAME}` (`noc_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "noc",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "noc_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tura",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noc_id` INTEGER NOT NULL, `primalac_id` INTEGER NOT NULL, `potvrdjena_u` INTEGER NOT NULL, `kljuc` TEXT NOT NULL, `ponistena_u` INTEGER, `ponistena_bez_pina` INTEGER NOT NULL, `razlog_tekst` TEXT, FOREIGN KEY(`noc_id`) REFERENCES `noc`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`primalac_id`) REFERENCES `noc_primalac`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nocId",
+            "columnName": "noc_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "primalacId",
+            "columnName": "primalac_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "potvrdjenaU",
+            "columnName": "potvrdjena_u",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kljuc",
+            "columnName": "kljuc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ponistenaU",
+            "columnName": "ponistena_u",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ponistenaBezPina",
+            "columnName": "ponistena_bez_pina",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "razlogTekst",
+            "columnName": "razlog_tekst",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tura_noc_id",
+            "unique": false,
+            "columnNames": [
+              "noc_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tura_noc_id` ON `${TABLE_NAME}` (`noc_id`)"
+          },
+          {
+            "name": "index_tura_primalac_id",
+            "unique": false,
+            "columnNames": [
+              "primalac_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tura_primalac_id` ON `${TABLE_NAME}` (`primalac_id`)"
+          },
+          {
+            "name": "index_tura_kljuc",
+            "unique": true,
+            "columnNames": [
+              "kljuc"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tura_kljuc` ON `${TABLE_NAME}` (`kljuc`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "noc",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "noc_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "noc_primalac",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "primalac_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "stavka_ture",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tura_id` INTEGER NOT NULL, `artikal_id` INTEGER NOT NULL, `artikal_naziv` TEXT NOT NULL, `artikal_redoslijed` INTEGER NOT NULL, `kategorija_id` INTEGER NOT NULL, `kategorija_naziv` TEXT NOT NULL, `kategorija_redoslijed` INTEGER NOT NULL, `mjera_id` INTEGER NOT NULL, `mjera_naziv` TEXT NOT NULL, `mjera_natpis` TEXT NOT NULL, `mjera_u_zbiru` TEXT NOT NULL, `mjera_redoslijed` INTEGER NOT NULL, `litara` REAL, `kolicina` INTEGER NOT NULL, FOREIGN KEY(`tura_id`) REFERENCES `tura`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "turaId",
+            "columnName": "tura_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artikalId",
+            "columnName": "artikal_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artikalNaziv",
+            "columnName": "artikal_naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artikalRedoslijed",
+            "columnName": "artikal_redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kategorijaId",
+            "columnName": "kategorija_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kategorijaNaziv",
+            "columnName": "kategorija_naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kategorijaRedoslijed",
+            "columnName": "kategorija_redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraId",
+            "columnName": "mjera_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraNaziv",
+            "columnName": "mjera_naziv",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraNatpis",
+            "columnName": "mjera_natpis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraUZbiru",
+            "columnName": "mjera_u_zbiru",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mjeraRedoslijed",
+            "columnName": "mjera_redoslijed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "litara",
+            "columnName": "litara",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "kolicina",
+            "columnName": "kolicina",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stavka_ture_tura_id",
+            "unique": false,
+            "columnNames": [
+              "tura_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stavka_ture_tura_id` ON `${TABLE_NAME}` (`tura_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tura",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tura_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "nacrt_ture",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `primalac_id` INTEGER, `kljuc` TEXT NOT NULL, `stavke` TEXT NOT NULL, `izmijenjen_u` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`primalac_id`) REFERENCES `noc_primalac`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "primalacId",
+            "columnName": "primalac_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "kljuc",
+            "columnName": "kljuc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stavke",
+            "columnName": "stavke",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "izmijenjenU",
+            "columnName": "izmijenjen_u",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_nacrt_ture_primalac_id",
+            "unique": false,
+            "columnNames": [
+              "primalac_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_nacrt_ture_primalac_id` ON `${TABLE_NAME}` (`primalac_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "noc_primalac",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "primalac_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b508082483436c09d51b50728a007f3e')"
+    ]
+  }
+}
