@@ -55,14 +55,16 @@ fun PlocicaOsobe(
 ) {
     val izvor = remember { MutableInteractionSource() }
     val pritisnuta by izvor.collectIsPressedAsState()
+    // Izabran Šank izgleda isto kao izabran konobar (spec 7 #29); isprekidan okvir samo kad nije izabran.
+    val isprekidan = sank && !izabrana
     val pozadina = when {
-        sank -> Color.Transparent
         izabrana -> Boje.primary
+        sank -> Color.Transparent
         pritisnuta -> Boje.pressed
         else -> Boje.tile
     }
-    val imeBoja = if (izabrana && !sank) Boje.onPrimary else Boje.ink
-    val zbirBoja = if (izabrana && !sank) Boje.onPrimary else Boje.muted
+    val imeBoja = if (izabrana) Boje.onPrimary else Boje.ink
+    val zbirBoja = if (izabrana) Boje.onPrimary else Boje.muted
     Row(
         modifier = modifier
             .width(228.dp)
@@ -70,7 +72,7 @@ fun PlocicaOsobe(
             .clip(Oblici.lg)
             .background(pozadina)
             .then(
-                if (sank) Modifier.drawBehind {
+                if (isprekidan) Modifier.drawBehind {
                     val s = 1.5.dp.toPx()
                     drawRoundRect(
                         color = Boje.neutralLine,
@@ -90,9 +92,9 @@ fun PlocicaOsobe(
             Text(ime, style = Tekst.body.copy(fontSize = 20.sp, lineHeight = 24.sp, fontWeight = FontWeight.Bold), color = imeBoja, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(zbir, style = Tekst.body.copy(fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium), color = zbirBoja, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        if (izabrana && !sank) {
+        if (izabrana) {
             Box(Modifier.size(28.dp).clip(Oblici.pill).background(Color(0xFF191919)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.Check, null, Modifier.size(18.dp), tint = Boje.primary)
+                Icon(Icons.Rounded.Check, "Izabrano", Modifier.size(18.dp), tint = Boje.primary)
             }
         }
     }

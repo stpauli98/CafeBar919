@@ -2,7 +2,9 @@ package dev.nextpixel.cafebar919.ui.components
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertIsNotSelected
@@ -66,6 +68,18 @@ class SankKomponenteTest {
     @Test fun plocicaOsobe_neizabranaNemaSelected() {
         compose.setContent { CafeBarTema { PlocicaOsobe("Srđan", "još ništa", izabrana = false, sank = false, onClick = {}) } }
         compose.onNodeWithText("Srđan").assertIsNotSelected()
+    }
+
+    @Test fun plocicaOsobe_izabranSankIzgledaKaoIzabranKonobar() {
+        compose.setContent {
+            CafeBarTema {
+                PlocicaOsobe("Šank", "prosuto i ostalo", izabrana = true, sank = true, onClick = {})
+                PlocicaOsobe("Šank 2", "prosuto i ostalo", izabrana = false, sank = true, onClick = {})
+            }
+        }
+        compose.onNodeWithText("Šank", substring = false).assertIsSelected()
+        compose.onAllNodesWithContentDescription("Izabrano", useUnmergedTree = true).assertCountEquals(1)
+        compose.onNodeWithText("Šank 2").assertIsNotSelected()
     }
 
     @Test fun stepperTure_plusOnemogucenNa99() {
