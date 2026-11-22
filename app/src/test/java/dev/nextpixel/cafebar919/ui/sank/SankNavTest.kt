@@ -106,8 +106,34 @@ class SankNavTest {
     }
 
     @Test fun dovoljnoProstora_nemaBanera() {
-        prikazi(pokreni())
+        val pozivi = java.util.concurrent.atomic.AtomicInteger()
+        val kontejner = pokreni(Prostor { pozivi.incrementAndGet(); 500L * 1024 * 1024 })
+        prikazi(kontejner)
         cekaj("Ko radi večeras?")
+        // Provjera pri spremnoj bazi je morala da se izvrši prije tvrdnje o odsustvu banera.
+        cekajUslov { pozivi.get() >= 1 }
+        kontejner.prostor.provjeri()
+        cekajUslov { true }
+        assertEquals(false, kontejner.prostor.nizak.value)
         compose.onNodeWithText("Razumijem").assertDoesNotExist()
+        assertEquals(false, postoji("Na tabletu je ostalo malo prostora.", dio = true))
+    }
+
+    @Test fun prostor01_provjeraPoslijeOtvaranjaNoci() {
+        val slobodno = java.util.concurrent.atomic.AtomicLong(500L * 1024 * 1024)
+        val kontejner = pokreni(Prostor { slobodno.get() })
+        prikazi(kontejner)
+        cekaj("Ko radi večeras?")
+        kontejner.prostor.provjeri()
+        cekajUslov { true }
+        compose.onNodeWithText("Razumijem").assertDoesNotExist()
+
+        slobodno.set(100L * 1024 * 1024)
+        dodirni("Vuleta")
+        cekaj("Otvori noć · 1 radnik")
+        dodirni("Otvori noć · 1 radnik")
+        cekaj("Noć otvorena od", dio = true)
+        cekaj("Na tabletu je ostalo malo prostora.", dio = true)
+        compose.onNodeWithText("Razumijem").assertExists()
     }
 }
