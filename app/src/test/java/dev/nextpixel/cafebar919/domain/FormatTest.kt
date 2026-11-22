@@ -1,5 +1,7 @@
 package dev.nextpixel.cafebar919.domain
 
+import java.time.ZoneId
+import java.time.LocalDateTime
 import java.time.LocalDate
 import org.junit.Test
 import org.junit.Assert.assertEquals
@@ -55,4 +57,40 @@ class FormatTest {
     }
 
     @Test fun datumNoci() { assertEquals("Subota 21. 11.", Format.datumNoci(LocalDate.of(2026, 11, 21))) }
+
+    @Test fun mjeraNaPlocici() {
+        assertEquals("komad", Format.mjeraNaPlocici("Komad", null))
+        assertEquals("doza 0,03 l", Format.mjeraNaPlocici("Doza", 0.03))
+        assertEquals("boca 0,70 l", Format.mjeraNaPlocici("Boca 0,7", 0.70))
+        assertEquals("boca 1,00 l", Format.mjeraNaPlocici("Boca 1 l", 1.0))
+    }
+
+    @Test fun mjeraUStavci() {
+        assertEquals("komad", Format.mjeraUStavci("Komad", null, 4))
+        assertEquals("doza · 0,06 l", Format.mjeraUStavci("Doza", 0.03, 2))
+        assertEquals("doza · 0,09 l", Format.mjeraUStavci("Doza", 0.03, 3))
+        assertEquals("bokal · 0,25 l", Format.mjeraUStavci("Bokal", 0.25, 1))
+    }
+
+    @Test fun sazetakTure_imePaBroj() = assertEquals(
+        "Jelen pivo 4 · Jack Daniel’s doza 2 · Rakija šljiva bok. 1",
+        Format.sazetakTure(listOf(
+            Format.StavkaSazetka("Jelen pivo", "kom", null, 4),
+            Format.StavkaSazetka("Jack Daniel’s", "doza", 0.03, 2),
+            Format.StavkaSazetka("Rakija šljiva", "bok.", 0.25, 1),
+        )),
+    )
+
+    @Test fun vrijemeIDatumMalim() {
+        val z = ZoneId.of("Europe/Sarajevo")
+        assertEquals("23:47", Format.vrijeme(LocalDateTime.of(2026, 11, 20, 23, 47).atZone(z).toInstant().toEpochMilli(), z))
+        assertEquals("05:03", Format.vrijeme(LocalDateTime.of(2026, 11, 21, 5, 3).atZone(z).toInstant().toEpochMilli(), z))
+        assertEquals("subota 21. 11.", Format.datumMalim(LocalDate.of(2026, 11, 21)))
+    }
+
+    @Test fun natpisILitreKategorija() {
+        assertEquals("Bokal · 1", Format.natpisUTuri("Bokal", 1))
+        assertEquals("Žestina 0,31 l · Vino 0,20 l", Format.litreKategorija(listOf(Obracun.KategorijaLitre("Žestina", 0.31), Obracun.KategorijaLitre("Vino", 0.2))))
+        assertEquals("", Format.litreKategorija(emptyList()))
+    }
 }

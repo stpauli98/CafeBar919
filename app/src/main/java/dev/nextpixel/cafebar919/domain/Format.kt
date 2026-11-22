@@ -2,7 +2,11 @@ package dev.nextpixel.cafebar919.domain
 
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object Format {
     private val DANI = listOf("Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja")
@@ -64,4 +68,35 @@ object Format {
 
     fun datumNoci(d: LocalDate): String =
         "${DANI[d.dayOfWeek.value - 1]} ${d.dayOfMonth}. ${d.monthValue}."
+
+    private val SR = Locale.forLanguageTag("sr")
+
+    private fun osnova(naziv: String): String = naziv.replace(KOLICINA_NA_KRAJU, "").lowercase(SR)
+
+    /** Mjera na pločici (spec 7 #13): „komad“, „doza 0,03 l“, „boca 0,70 l“. */
+    fun mjeraNaPlocici(naziv: String, litara: Double?): String =
+        if (litara == null) naziv.lowercase(SR) else "${osnova(naziv)} ${litreSaJedinicom(litara)}"
+
+    /** Mjera u stavci ture: „komad“, „doza · 0,06 l“. */
+    fun mjeraUStavci(naziv: String, litara: Double?, kolicina: Int): String =
+        if (litara == null) naziv.lowercase(SR)
+        else "${osnova(naziv)} · ${litreSaJedinicom(BigDecimal.valueOf(litara).multiply(BigDecimal(kolicina)).toDouble())}"
+
+    fun natpisUTuri(natpis: String, kolicina: Int): String = "$natpis · $kolicina"
+
+    data class StavkaSazetka(val naziv: String, val uZbiru: String, val litara: Double?, val kolicina: Int)
+
+    /** Sažetak ture (spec 7 #12): „Jelen pivo 4 · Jack Daniel’s doza 2“; piće bez litara bez oznake mjere. */
+    fun sazetakTure(stavke: List<StavkaSazetka>): String = stavke.joinToString(" · ") {
+        if (it.litara == null) "${it.naziv} ${it.kolicina}" else "${it.naziv} ${it.uZbiru} ${it.kolicina}"
+    }
+
+    fun litreKategorija(l: List<Obracun.KategorijaLitre>): String =
+        l.joinToString(" · ") { "${it.naziv} ${litreSaJedinicom(it.litara)}" }
+
+    fun vrijeme(ms: Long, zona: ZoneId): String =
+        DateTimeFormatter.ofPattern("HH:mm").format(Instant.ofEpochMilli(ms).atZone(zona))
+
+    fun datumMalim(d: LocalDate): String =
+        "${DANI[d.dayOfWeek.value - 1].lowercase(SR)} ${d.dayOfMonth}. ${d.monthValue}."
 }

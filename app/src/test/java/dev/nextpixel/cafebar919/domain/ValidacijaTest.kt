@@ -33,4 +33,14 @@ class ValidacijaTest {
         assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_PREDUG), Validacija.provjeriNaziv("x".repeat(25), 24))
         assertEquals(Ishod.Ok, Validacija.provjeriNaziv("x".repeat(24), 24))
     }
+
+
+    @Test fun provjeriIspomoc_odbijaPraznoSankIZauzeto() {
+        val zauzeta = listOf("Vuleta", "Srđan")
+        assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_PRAZAN), Validacija.provjeriIspomoc("   ", zauzeta))
+        assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_POSTOJI), Validacija.provjeriIspomoc(" vuleta ", zauzeta))
+        assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_POSTOJI), Validacija.provjeriIspomoc("šank", zauzeta))
+        assertEquals(Ishod.Odbijeno(Odbijanje.NAZIV_PREDUG), Validacija.provjeriIspomoc("A".repeat(21), zauzeta))
+        assertEquals(Ishod.Ok, Validacija.provjeriIspomoc("Dejan M.", zauzeta))
+    }
 }
