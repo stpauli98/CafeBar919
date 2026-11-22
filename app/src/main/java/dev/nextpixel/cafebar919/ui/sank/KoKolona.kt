@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -36,6 +37,8 @@ internal fun KoKolona(s: UnosStanje, onIzaberi: (Long) -> Unit, modifier: Modifi
         "Ispomoć" to VrstaPrimaoca.ISPOMOC,
     ).map { (naslov, vrsta) -> naslov to s.primaoci.filter { it.vrsta == vrsta } }.filter { it.second.isNotEmpty() }
     val sank = s.primaoci.filter { it.vrsta == VrstaPrimaoca.SANK }
+    val fokus = LocalFocusManager.current
+    val izaberi = { id: Long -> fokus.clearFocus(); onIzaberi(id) }
     Column(
         modifier
             .width(276.dp)
@@ -50,14 +53,14 @@ internal fun KoKolona(s: UnosStanje, onIzaberi: (Long) -> Unit, modifier: Modifi
                     Text(naslov.uppercase(), color = Boje.muted, style = NatpisGrupe, modifier = Modifier.padding(top = if (i == 0) 0.dp else 10.dp))
                 }
                 items(lista, key = { it.id }) { p ->
-                    PlocicaOsobe(p.ime, s.zbirovi[p.id] ?: "još ništa", izabrana = s.primalacId == p.id, sank = false, onClick = { onIzaberi(p.id) })
+                    PlocicaOsobe(p.ime, s.zbirovi[p.id] ?: "još ništa", izabrana = s.primalacId == p.id, sank = false, onClick = { izaberi(p.id) })
                 }
             }
         }
         if (sank.isNotEmpty()) {
             Text("Van zbira".uppercase(), color = Boje.muted, style = NatpisGrupe)
             sank.forEach { p ->
-                PlocicaOsobe(p.ime, s.zbirovi[p.id] ?: "prosuto i ostalo", izabrana = s.primalacId == p.id, sank = true, onClick = { onIzaberi(p.id) })
+                PlocicaOsobe(p.ime, s.zbirovi[p.id] ?: "prosuto i ostalo", izabrana = s.primalacId == p.id, sank = true, onClick = { izaberi(p.id) })
             }
         }
     }

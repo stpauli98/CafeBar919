@@ -5,6 +5,8 @@ import android.view.View
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
@@ -129,6 +131,21 @@ class UnosEkranTest {
         compose.onNodeWithText("Poništi").assertExists()
         cekaj("TURA")
         cekaj("Nova tura")
+    }
+
+    @Test fun pretraga_dodirPicaSkidaFokus() {
+        podaci()
+        prikazi()
+        cekaj("Vuleta")
+        dodirni("Vuleta")
+        cekaj("TURA ZA")
+        val polje = compose.onNode(hasSetTextAction())
+        polje.performClick()
+        polje.performTextInput("Jack")
+        polje.assertIsFocused()
+        dodirni("Jack Daniel’s")
+        cekaj("Potvrdi · Vuleta")
+        polje.assertIsNotFocused()
     }
 
     @Test fun potvrdiOnemoguceno_porukeIzSpec17() {

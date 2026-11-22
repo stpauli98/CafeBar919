@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +69,7 @@ private val Tnum = Tekst.body.copy(fontFeatureSettings = "tnum")
 @Composable
 internal fun TuraKolona(s: UnosStanje, vm: UnosViewModel, modifier: Modifier = Modifier) {
     val ime = s.primaoci.firstOrNull { it.id == s.primalacId }?.ime
+    val fokus = LocalFocusManager.current
     val red = redovi(s)
     val poruka = Nacrt.porukaPotvrde(s.imaPica, ime != null, red.isNotEmpty())
     Column(
@@ -115,7 +117,7 @@ internal fun TuraKolona(s: UnosStanje, vm: UnosViewModel, modifier: Modifier = M
                 ime != null && poruka == null -> "Potvrdi · $ime"
                 else -> "Potvrdi"
             },
-            onClick = vm::potvrdi,
+            onClick = { fokus.clearFocus(); vm.potvrdi() },
             modifier = Modifier.fillMaxWidth().height(64.dp),
             ikona = if (s.greskaUpisa) Icons.Rounded.Refresh else Icons.Rounded.Check,
             omoguceno = poruka == null && !s.upisuje,

@@ -205,6 +205,7 @@ Svaka faza završava APK-om koji se proba na emulatoru tableta, i prolaskom svih
 **Faza 2 — noć i unos ture**
 - S0, S0.1, S1 (sa pretragom T1 i stanjem bez pića T2), nacrt ture koji preživljava restart, potvrda (transakcija, UUID, toast), traka „Posljednje“ sa poništavanjem u roku, UPIS-01, PROSTOR-01, `KEEP_SCREEN_ON`.
 - **Urađeno 22. 11. 2026** (versionCode 2, „1.1“). APK je instaliran preko faze 1 i podaci su ostali.
+  Kod i JVM testovi su gotovi, a APK je instaliran preko faze 1. Ručne provjere sa turama još nisu urađene, jer u bazi emulatora nema pića; ostaju otvorene dok vlasnik ne unese prava pića u V4: tri ture (jedna na Šank), poništavanje u roku, nacrt sa pićem koji preživljava restart, dvostruki dodir na „Potvrdi“ i pretraga „šljiva“ / T1.
 
 **Faza 3 — poništavanje, pregled, istorija**
 - S1.3 (PIN + razlog, T5), S2 / S2.1 / S2.2 (T3, T4), S1.2 Završi noć, S3 Istorija + T7 (baner stare noći, samo čitanje), automatsko brisanje starih noći.

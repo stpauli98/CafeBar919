@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,14 +34,14 @@ import dev.nextpixel.cafebar919.ui.theme.Tekst
 
 /**
  * Pretraga pića (Paper O2): pill, okvir 1,5 `line` (2 `primary` u fokusu), padding 16, razmak 10, lupa 20 `muted`,
- * tekst 16/20, placeholder „Traži piće“. Visina 56 (dodirna zona; Paper crta 48). `ImeAction.Search` sakriva tastaturu.
+ * tekst 16/20, placeholder „Traži piće“. Visina 56 (dodirna zona; Paper crta 48). `ImeAction.Search` skida fokus (i tako sakriva tastaturu).
  */
 @Suppress("DEPRECATION")
 @Composable
 fun PoljePretrage(upit: String, onUpit: (String) -> Unit, modifier: Modifier = Modifier) {
     val izvor = remember { MutableInteractionSource() }
     val fokus by izvor.collectIsFocusedAsState()
-    val tastatura = LocalSoftwareKeyboardController.current
+    val fokusUpravljac = LocalFocusManager.current
     val stil = Tekst.body.copy(fontSize = 16.sp, lineHeight = 20.sp)
     BasicTextField(
         value = upit,
@@ -51,7 +51,7 @@ fun PoljePretrage(upit: String, onUpit: (String) -> Unit, modifier: Modifier = M
         textStyle = stil.copy(color = Boje.ink),
         cursorBrush = SolidColor(Boje.primary),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { tastatura?.hide() }),
+        keyboardActions = KeyboardActions(onSearch = { fokusUpravljac.clearFocus() }),
         interactionSource = izvor,
         decorationBox = { unutra ->
             Row(

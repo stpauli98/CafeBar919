@@ -127,6 +127,35 @@ class TuraRepoTest {
         assertTrue(repo.potvrdi(kljuc, vuleta, stavke) is Potvrda.Upisana); assertEquals(1, brojTura())
     }
 
+    @Test fun potvrdi_punaBazaSqliteFullJeNijeUpisana() = runTest {
+        // Baza ograničena na trenutni broj stranica (PRAGMA max_page_count) i popunjena do SQLITE_FULL.
+        val velike = (1..40).map { StavkaNacrta(jelen, komad, it) }
+        repo.sacuvajNacrt(kljuc, vuleta, velike)
+        val sdb = db.openHelper.writableDatabase
+        val stranice = sdb.query("PRAGMA page_count").use { it.moveToFirst(); it.getLong(0) }
+        sdb.query("PRAGMA max_page_count = $stranice").use { it.moveToFirst() }
+        // Baza se puni redovima tabele `tura` (ključ iste dužine) dok ne dobije SQLITE_FULL; tada ni prava tura nema gdje.
+        var puno = false
+        var i = 0
+        while (!puno && i < 100_000) {
+            try {
+                sql("INSERT INTO tura (noc_id, primalac_id, potvrdjena_u, kljuc, ponistena_bez_pina) VALUES ($noc, $vuleta, 1, '${"%036d".format(i++)}', 0)")
+            } catch (e: android.database.sqlite.SQLiteFullException) {
+                puno = true
+            }
+        }
+        assertTrue("SQLITE_FULL nije izazvan", puno)
+        val popunjeno = brojTura()
+
+        assertEquals(Potvrda.NijeUpisana, repo.potvrdi(kljuc, vuleta, velike))
+        // SQLite sam vraća transakciju na SQLITE_FULL, pa Room javlja opštu SQLiteException (ne ograničenje): grana `Exception`.
+        val uzroci = org.robolectric.shadows.ShadowLog.getLogs().mapNotNull { it.throwable }
+        assertTrue(uzroci.toString(), uzroci.any { it is android.database.sqlite.SQLiteException && it !is android.database.sqlite.SQLiteConstraintException })
+        assertEquals(popunjeno, brojTura()); assertEquals(0, broj("SELECT COUNT(*) FROM stavka_ture"))
+        assertEquals(Nacrt.uJson(velike), repo.nacrt().stavke)
+        assertEquals(kljuc, repo.nacrt().kljuc); assertEquals(vuleta, repo.nacrt().primalacId)
+    }
+
     @Test fun potvrdi_greskaNaStavkamaVracaICijeluTuru() = runTest {
         // greška koja nije ograničenje (nepostojeća tabela), poslije upisa ture
         sql("CREATE TRIGGER kvar BEFORE INSERT ON stavka_ture BEGIN INSERT INTO nema_tabele VALUES (1); END")

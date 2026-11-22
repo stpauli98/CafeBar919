@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ internal fun PicaKolona(
         Box(modifier.padding(20.dp), contentAlignment = Alignment.Center) { NemaPica(onPodesavanja) }
         return
     }
+    val fokus = LocalFocusManager.current
     Column(modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LazyRow(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -80,7 +82,7 @@ internal fun PicaKolona(
                         mjere = p.mjere.map { m ->
                             MjeraNaPlocici(m.id, m.natpis, Format.mjeraNaPlocici(m.naziv, m.litara), Nacrt.kolicina(s.stavke, p.a.id, m.id))
                         },
-                        onDodaj = { mjeraId -> vm.dodaj(p.a.id, mjeraId) },
+                        onDodaj = { mjeraId -> fokus.clearFocus(); vm.dodaj(p.a.id, mjeraId) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
