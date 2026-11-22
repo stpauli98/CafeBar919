@@ -151,6 +151,6 @@ class NovaNocViewModel(
     class Fabrika(private val container: AppContainer) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            NovaNocViewModel(container.repo(), container.noc(), container.clock, poslijeOtvaranja = {}) as T
+            NovaNocViewModel(container.repo(), container.noc(), container.clock, poslijeOtvaranja = container::provjeriProstor) as T
     }
 }

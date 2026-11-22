@@ -43,19 +43,18 @@ import dev.nextpixel.cafebar919.ui.podesavanja.oaplikaciji.OAplikacijiEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.pin.PromjenaPinaEkran
 import dev.nextpixel.cafebar919.ui.podesavanja.pin.PromjenaPinaViewModel
 import dev.nextpixel.cafebar919.ui.podesavanja.pravila.PravilaViewModel
-import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
+import dev.nextpixel.cafebar919.ui.sank.SankEkran
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
-private const val RUTA_POCETNI = "pocetni"
+private const val RUTA_POCETNI = "sank"
 private const val RUTA_PODESAVANJA = "podesavanja/{sekcija}"
 
 private fun rutaSekcije(s: Sekcija) = "podesavanja/${s.name}"
 
-/** Navigacija aplikacije: početni ekran i podešavanja (ljuska + sekcija). Poziva se kad je baza spremna. */
+/** Navigacija aplikacije: ekran šanka (S0/S1) i podešavanja (ljuska + sekcija). Poziva se kad je baza spremna. */
 @Composable
-fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostController = rememberNavController()) {
+fun AppNav(container: AppContainer, navController: NavHostController = rememberNavController()) {
     val sesija = container.sesija
     val otkljucano by sesija.otkljucano.collectAsState()
     val ruta by navController.currentBackStackEntryAsState()
@@ -82,7 +81,7 @@ fun AppNav(container: AppContainer, danas: LocalDate, navController: NavHostCont
         composable(RUTA_POCETNI) {
             var pinOtvoren by rememberSaveable { mutableStateOf(false) }
             val glavna = rememberCoroutineScope()
-            PocetniEkran(danas = danas, onPodesavanja = { pinOtvoren = true })
+            SankEkran(container, onPodesavanja = { pinOtvoren = true })
             if (pinOtvoren) {
                 PinProzor(
                     pin = container.pin(),
