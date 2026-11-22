@@ -34,6 +34,6 @@ class PodesavanjaNavTest {
 
         compose.runOnIdle { sesija.zakljucaj() }
         compose.waitUntil(5_000) { !postoji("Nazad na unos") }
-        compose.onNodeWithText("Unos tura dolazi u sljedećoj fazi izrade.").assertExists()
+        compose.waitUntil(5_000) { postoji("Ko radi večeras?") }
     }
 }

@@ -17,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.time.LocalDate
 
 @Config(qualifiers = "w1280dp-h800dp")
 @RunWith(RobolectricTestRunner::class)
@@ -36,7 +35,7 @@ class PodesavanjaZakljucanoTest {
         compose.mainClock.autoAdvance = false
         compose.activity.setContent {
             nav = rememberNavController()
-            CafeBarTema { AppNav(kontejner, LocalDate.of(2026, 11, 21), nav) }
+            CafeBarTema { AppNav(kontejner, nav) }
         }
         compose.mainClock.advanceTimeBy(500)
         compose.runOnUiThread { nav.navigate("podesavanja/ARTIKLI") }
@@ -46,6 +45,6 @@ class PodesavanjaZakljucanoTest {
             compose.onNodeWithText("Otključano za vlasnika.").assertDoesNotExist()
         }
         compose.mainClock.autoAdvance = true
-        compose.waitUntil(5_000) { postoji("Unos tura dolazi u sljedećoj fazi izrade.") }
+        compose.waitUntil(5_000) { postoji("Ko radi večeras?") }
     }
 }

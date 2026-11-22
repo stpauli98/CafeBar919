@@ -12,5 +12,6 @@ enum class Odbijanje {
     KATEGORIJA_ISKLJUCENA, MJERA_ISKLJUCENA,     // pri uključivanju artikla
     NATPIS_PRAZAN, NATPIS_PREDUG, U_ZBIRU_PRAZNO, U_ZBIRU_PREDUGO, LITRE_VAN_OPSEGA,
     POSLJEDNJI_RAZLOG,                           // poništavanje traži izabran razlog: posljednji aktivan se ne uklanja
-    VRIJEDNOST_VAN_OPSEGA                        // stepper V6
+    VRIJEDNOST_VAN_OPSEGA,                       // stepper V6
+    PRAZNA_TURA, BEZ_PRIMAOCA, NEMA_NOCI, ROK_ISTEKAO, VEC_PONISTENA  // tura (faza 2)
 }

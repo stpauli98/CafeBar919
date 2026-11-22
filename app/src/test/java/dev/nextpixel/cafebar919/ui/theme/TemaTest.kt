@@ -6,14 +6,23 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.nextpixel.cafebar919.ui.pocetni.PocetniEkran
+import androidx.test.core.app.ApplicationProvider
+import dev.nextpixel.cafebar919.MutableClock
+import dev.nextpixel.cafebar919.data.AppDatabase
+import dev.nextpixel.cafebar919.repo.NocRepo
+import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
+import dev.nextpixel.cafebar919.ui.sank.NovaNocEkran
+import dev.nextpixel.cafebar919.ui.sank.NovaNocViewModel
 import java.time.LocalDate
+import java.time.ZoneId
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@Config(qualifiers = "w1280dp-h800dp")
 @RunWith(RobolectricTestRunner::class)
 class TemaTest {
     @get:Rule val compose = createComposeRule()
@@ -26,11 +35,17 @@ class TemaTest {
         assertEquals(16.sp, Tekst.body.fontSize)
     }
 
-    @Test fun pocetniEkranPrikazujePodesavanjaIDatum() {
-        compose.setContent {
-            CafeBarTema { PocetniEkran(danas = LocalDate.of(2026, 11, 21), onPodesavanja = {}) }
+    @Test fun novaNocPrikazujePodesavanjaIDatum() {
+        val zona = ZoneId.systemDefault()
+        val sat = MutableClock(LocalDate.of(2026, 11, 21).atTime(21, 0).atZone(zona).toInstant(), zona)
+        val db = AppDatabase.napravi(ApplicationProvider.getApplicationContext(), null)
+        try {
+            val vm = NovaNocViewModel(PodesavanjaRepo(db, sat), NocRepo(db, sat), sat, poslijeOtvaranja = {})
+            compose.setContent { CafeBarTema { NovaNocEkran(vm, onPodesavanja = {}) } }
+            compose.onNodeWithText("Podešavanja").assertIsDisplayed()
+            compose.onNodeWithText("Subota 21. 11.").assertIsDisplayed()
+        } finally {
+            db.close()
         }
-        compose.onNodeWithText("Podešavanja").assertIsDisplayed()
-        compose.onNodeWithText("Subota 21. 11.").assertIsDisplayed()
     }
 }

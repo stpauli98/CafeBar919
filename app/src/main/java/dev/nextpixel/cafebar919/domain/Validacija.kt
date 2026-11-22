@@ -44,4 +44,13 @@ object Validacija {
             else -> Ishod.Ok
         }
     }
+
+    /** Naziv ispomoći: kao naziv, ali „Šank“ i već zauzeta imena su rezervisana. */
+    fun provjeriIspomoc(ime: String, zauzeta: List<String>): Ishod {
+        val osnovno = provjeriNaziv(ime, IME_MAX)
+        if (osnovno != Ishod.Ok) return osnovno
+        val kljuc = kljucNaziva(ime)
+        return if (kljuc == kljucNaziva("Šank") || zauzeta.any { kljucNaziva(it) == kljuc }) Ishod.Odbijeno(Odbijanje.NAZIV_POSTOJI)
+        else Ishod.Ok
+    }
 }

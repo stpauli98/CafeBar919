@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dev.nextpixel.cafebar919.data.dao.ArtikalDao
 import dev.nextpixel.cafebar919.data.dao.KategorijaDao
 import dev.nextpixel.cafebar919.data.dao.MjeraDao
@@ -12,6 +13,13 @@ import dev.nextpixel.cafebar919.data.dao.NocDao
 import dev.nextpixel.cafebar919.data.dao.PostavkeDao
 import dev.nextpixel.cafebar919.data.dao.RadnikDao
 import dev.nextpixel.cafebar919.data.dao.RazlogDao
+
+/** `synchronous = FULL`: potvrđena tura ne smije nestati ni kad tablet ostane bez struje. */
+internal object TrajniUpis : RoomDatabase.Callback() {
+    override fun onOpen(db: SupportSQLiteDatabase) {
+        db.query("PRAGMA synchronous=FULL").use { it.moveToFirst() }
+    }
+}
 
 @Database(
     entities = [
@@ -41,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
             } else {
                 Room.databaseBuilder(app, AppDatabase::class.java, imeFajla)
             }
-            return builder.addCallback(PocetniPodaci.callback).build()
+            return builder.addCallback(PocetniPodaci.callback).addCallback(TrajniUpis).build()
         }
     }
 }

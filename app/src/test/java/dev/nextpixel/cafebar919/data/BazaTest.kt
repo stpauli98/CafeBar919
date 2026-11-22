@@ -42,6 +42,22 @@ class BazaTest {
         assertTrue(p.ispomocDozvoljena); assertTrue(p.pinProbni); assertTrue(Pin.provjeri("123456", p.pinHes, p.pinSo))
     }
 
+    @Test fun synchronousJeFull() {
+        val v = db.openHelper.writableDatabase.query("PRAGMA synchronous").use { it.moveToFirst(); it.getInt(0) }
+        assertEquals(2, v)
+    }
+
+    private fun sync(d: androidx.sqlite.db.SupportSQLiteDatabase) =
+        d.query("PRAGMA synchronous").use { it.moveToFirst(); it.getInt(0) }
+
+    @Test fun trajniUpis_postavljaFullPoslijeOff() {
+        val sdb = db.openHelper.writableDatabase
+        sdb.query("PRAGMA synchronous = OFF").close()
+        assertEquals(0, sync(sdb))
+        TrajniUpis.onOpen(sdb)
+        assertEquals(2, sync(sdb))
+    }
+
     private suspend fun napraviNocSTurom(kljuc: String): Triple<Long, Long, Long> {
         val noc = db.nocDao().dodajNoc(NocE(datum = 20_000, otvorenaU = 1_000))
         val primalac = db.nocDao().dodajPrimaoce(listOf(NocPrimalacE(nocId = noc, vrsta = VrstaPrimaoca.KONOBAR, radnikId = null, ime = "Vuleta", redoslijed = 0))).single()

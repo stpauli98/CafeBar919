@@ -3,9 +3,14 @@ package dev.nextpixel.cafebar919
 import android.content.Context
 import dev.nextpixel.cafebar919.data.AppDatabase
 import dev.nextpixel.cafebar919.data.OtvaranjeBaze
+import dev.nextpixel.cafebar919.data.Prostor
+import dev.nextpixel.cafebar919.data.ProstorStanje
+import dev.nextpixel.cafebar919.data.ProstorTableta
 import dev.nextpixel.cafebar919.data.StanjeBaze
+import dev.nextpixel.cafebar919.repo.NocRepo
 import dev.nextpixel.cafebar919.repo.PinServis
 import dev.nextpixel.cafebar919.repo.PodesavanjaRepo
+import dev.nextpixel.cafebar919.repo.TuraRepo
 import dev.nextpixel.cafebar919.ui.podesavanja.PodesavanjaSesija
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,11 +22,18 @@ import kotlinx.coroutines.launch
 import java.time.Clock
 
 /** Drži sat i otvaranje baze; repozitoriji i servisi se dodaju kad ih taskovi naprave. */
-class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone()) {
+class AppContainer(
+    context: Context,
+    val clock: Clock = Clock.systemDefaultZone(),
+    prostor: Prostor = ProstorTableta(context.applicationContext.filesDir),
+) {
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val otvaranjeBaze = OtvaranjeBaze { AppDatabase.napravi(appContext) }
+
+    /** PROSTOR-01; provjera ide na IO nit (StatFs može da blokira), pa se poziva iz [scope]. */
+    val prostor = ProstorStanje(prostor)
 
     private var podesavanjaRepo: PodesavanjaRepo? = null
 
@@ -45,6 +57,28 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         return PinServis(stanje.db, clock).also { pinServis = it }
     }
 
+    private var nocRepo: NocRepo? = null
+
+    /** Pravi repozitorij noći jednom, tek kad je baza spremna. */
+    @Synchronized
+    fun noc(): NocRepo {
+        nocRepo?.let { return it }
+        val stanje = otvaranjeBaze.stanje.value
+        check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
+        return NocRepo(stanje.db, clock).also { nocRepo = it }
+    }
+
+    private var turaRepo: TuraRepo? = null
+
+    /** Pravi repozitorij ture jednom, tek kad je baza spremna. */
+    @Synchronized
+    fun ture(): TuraRepo {
+        turaRepo?.let { return it }
+        val stanje = otvaranjeBaze.stanje.value
+        check(stanje is StanjeBaze.Spremna) { "Baza još nije spremna" }
+        return TuraRepo(stanje.db, clock).also { turaRepo = it }
+    }
+
     /** Posljednja vrijednost „zaključavanje_s“ iz postavki; 120 s dok baza nije spremna. */
     private val zakljucavanjeS = MutableStateFlow(120)
 
@@ -55,8 +89,17 @@ class AppContainer(context: Context, val clock: Clock = Clock.systemDefaultZone(
         pokusajPonovo()
         scope.launch {
             otvaranjeBaze.stanje.filterIsInstance<StanjeBaze.Spremna>().first()
+            this@AppContainer.prostor.provjeri()
+        }
+        scope.launch {
+            otvaranjeBaze.stanje.filterIsInstance<StanjeBaze.Spremna>().first()
             repo().postavke.collect { zakljucavanjeS.value = it.zakljucavanjeS }
         }
+    }
+
+    /** Provjera slobodnog prostora van glavne niti; poziva se i poslije otvaranja noći. */
+    fun provjeriProstor() {
+        scope.launch { prostor.provjeri() }
     }
 
     /** Pokreće (ponovo) otvaranje baze; poziva se pri startu i iz dugmeta „Pokušaj ponovo“. */
